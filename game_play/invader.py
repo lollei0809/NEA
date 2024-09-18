@@ -11,7 +11,7 @@ from pygame import (
 
 # constants
 SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 800
+SCREEN_HEIGHT = 600
 PLAYER_SPEED = 10
 MAX_BULLETS = 5
 
