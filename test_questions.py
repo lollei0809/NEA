@@ -22,6 +22,6 @@ class TestUnsignedQuestion:
 
     def test_question(self, unsigned_question):
         if unsigned_question.question_type == type[0]:
-            assert unsigned_question.question >= 0 and unsigned_question <= 255
+            assert unsigned_question.question >= 0 and unsigned_question.question <= 255
         if unsigned_question.question_type == type[1]:
             assert True
