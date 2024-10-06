@@ -37,7 +37,7 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__()
         # create a surface to show the object
         self.surf = pygame.Surface((5, 20))
-        self.surf.fill((255,255,255))
+        self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(center=pos)
 
     def update(self):
