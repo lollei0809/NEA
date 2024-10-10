@@ -1,9 +1,10 @@
 import pytest
 from questions import UnsignedQuestion
-
+import random
 
 class TestUnsignedQuestion:
     @pytest.fixture
+    random.seed(12345678) # first time you generate numbers they are repeated when you reset the seed.
     def unsigned_question(self):
         test_question = UnsignedQuestion()
         test_question.generate_question_type()
@@ -25,3 +26,7 @@ class TestUnsignedQuestion:
             assert unsigned_question.question >= 0 and unsigned_question.question <= 255
         if unsigned_question.question_type == type[1]:
             assert True
+
+
+#boundry case and wrong cases
+#concrete examples

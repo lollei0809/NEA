@@ -1,6 +1,6 @@
 import random
 from abc import ABC, abstractmethod
-
+import math
 
 class Question(ABC):  # abstract base class which other question objects inherit from
     def __init__(self):
@@ -170,6 +170,38 @@ class SignAndMagnitude(Question):
             #         total += "0"
             #     j /= 2
             # self.correct_answer = msb+total
+
+class HexToDec(Question): #hexidecimal to binary
+    def __init__(self):
+        super().__init__()  # Call the parent constructor
+        self.types = ["htd,dth"]
+        self.type = ""
+        self.num_bits = 8
+        self.num_nibbles = int(self.num_bits/4)
+        self.question_phrase = ""
+        self.chars = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
+
+    def generate_question(self):
+        bits = ""
+        self.type = random.choice(self.types)
+        if self.type == "htd":
+            for i in range(self.num_nibbles):
+                bits = bits + random.choice(self.chars)
+        else:
+            bits= random.randint(0, 2 ** self.num_bits - 1)
+        self.question = bits
+
+    def generate_question_phrase(self):
+        if self.type == "htb":
+            self.question_phrase = f"convert this hexidecimal number{self.question} to unsigned binary"
+        else:
+            self.question_phrase = f"convert this unsigned binary number{self.question} to hexidecimal"
+
+    def generate_correct_answer(self):
+        self.correct_answer = ""
+        if self.type == "htb":
+            for i in range(self.num_nibbles):
+                pass
 
 
 
