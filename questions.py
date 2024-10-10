@@ -261,7 +261,7 @@ class HexToDec(Question):  # hexidecimal to binary
             decimal = int(self.question)
             while decimal > 0:
                 remainder = decimal % 16
-                hexadecimal += #####################
+                hexadecimal += #####
                 decimal = decimal // 16
                 j /= 16
             self.correct_answer = hexadecimal
