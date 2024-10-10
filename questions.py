@@ -167,29 +167,106 @@ class SignAndMagnitude(Question):
                 msb = "0"
             else:
                 msb = "1"
-            j = 2 ** (self.num_bits-2)
+            j = 2 ** (self.num_bits - 2)
             total = msb
             temp = abs(int(self.question))
-            for i in range(self.num_bits-1):
-                 if temp >= j:
-                     total += "1"
-                     temp -= j
-                 else:
-                     total += "0"
-                 j /= 2
+            for i in range(self.num_bits - 1):
+                if temp >= j:
+                    total += "1"
+                    temp -= j
+                else:
+                    total += "0"
+                j /= 2
             self.correct_answer = total
 
+    def generate_plausible_answers(self):
+        """if self.question_type == "dtb":
+            bit_index = -1
+            for i in range(2):
+                exclude = [bit_index]
+                while True:
+                    bit_index = random.randint(0, self.num_bits - 1)
+                    if bit_index not in exclude:  # excludes the number that has already been used so plausible answers
+                        # doesnt have duplicates
+                        break
+                temp = list(self.correct_answer)  # passing mutable objects calls by reference?
+                if temp[bit_index] == "0":
+                    temp[bit_index] = "1"
+                else:
+                    temp[bit_index] = "0"
+                t = "".join(temp)
+                self.plausible_answers.append(t)
+        else:
+            num = -1 * (int(self.correct_answer) + 1)
+            for i in range(2):
+                exclude = [num]
+                while True:
+                    num = random.randint(-1 * int(self.correct_answer) // 2,
+                                         int(self.correct_answer) // 2)  # floor division
+                    # by 2 so the number isn't too far off so less easy to rule out answers
+                    if num not in exclude:
+                        break
+                temp = int(self.correct_answer) + num
+                self.plausible_answers.append(temp)
+        random.shuffle(self.plausible_answers)
+        """
 
-if __name__ == "__main__":  # importing this module wont run the code
-    # put these tests in pytest file
-    # create new subclasses after tests are written: test driven development
-    question = UnsignedQuestion()
-    question.generate_question()
-    print("Question:", question.question)
-    question.generate_correct_answer()
-    print("Correct Answer:", question.correct_answer)
-    question.generate_plausible_answers()
-    print("Plausible Answers:", question.plausible_answers)
-    question.generate_question_phrase()
-    print("question phrase:", question.question_phrase)
-    print("question type:", question.question_type)
+
+class HexToDec(Question):  # hexidecimal to binary
+    def __init__(self):
+        super().__init__()  # Call the parent constructor
+        self.types = ["htd,dth"]
+        self.type = ""
+        self.num_bits = 8
+        self.num_hex_chars = self.num_bits/4
+        self.question_phrase = ""
+        self.chars = {  '0': 0, '1': 1, '2': 2, '3': 3,
+                        '4': 4, '5': 5, '6': 6, '7': 7,
+                        '8': 8, '9': 9, 'A': 10, 'B': 11,
+                        'C': 12, 'D': 13, 'E': 14, 'F': 15}
+
+    def generate_question(self):
+        bits = ""
+        self.type = random.choice(self.types)
+        if self.type == "htd":
+            for i in range(self.num_hex_chars):
+                bits = bits + random.choice(self.chars)
+        else:
+            bits = random.randint(0, 2 ** self.num_bits - 1)
+        self.question = bits
+
+    def generate_question_phrase(self):
+        if self.type == "htb":
+            self.question_phrase = f"convert this hexidecimal number{self.question} to unsigned binary"
+        else:
+            self.question_phrase = f"convert this unsigned binary number{self.question} to hexidecimal"
+
+    def generate_correct_answer(self):
+        key_list = list(self.chars.keys())
+        val_list = list(self.chars.values())
+        self.correct_answer = ""
+        if self.type == "htd":
+            j = 1
+            decimal = 0
+            for i in range(int(self.num_hex_chars)):
+                char = self.question[-(i + 1)]
+                position = key_list.index(char)
+                val = val_list[position]
+                decimal += j * val
+                j *= 16
+            self.correct_answer = decimal
+        else:
+            j = 16 ** (self.num_hex_chars - 1)
+            hexadecimal = ""
+            decimal = int(self.question)
+            while decimal > 0:
+                remainder = decimal % 16
+                hexadecimal += #####################
+                decimal = decimal // 16
+                j /= 16
+            self.correct_answer = hexadecimal
+
+        self.plausible_answers.append(self.correct_answer)
+
+
+
