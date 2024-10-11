@@ -105,9 +105,9 @@ class UnsignedQuestion(Question):
                 t = "".join(temp)
                 self.plausible_answers.append(t)
         else:
-            num = -1 * (int(self.correct_answer) + 1)
+            num = 0
             for i in range(2):
-                exclude = [num]
+                exclude = [num] # excludes the correct answer and the answer added in the first loop
                 while True:
                     num = random.randint(-1 * int(self.correct_answer) // 2,
                                          int(self.correct_answer) // 2)  # floor division
@@ -180,7 +180,7 @@ class SignAndMagnitude(Question):
             self.correct_answer = total
 
     def generate_plausible_answers(self):
-        """if self.question_type == "dtb":
+        if self.question_type == "dtsm":
             bit_index = -1
             for i in range(2):
                 exclude = [bit_index]
@@ -197,19 +197,17 @@ class SignAndMagnitude(Question):
                 t = "".join(temp)
                 self.plausible_answers.append(t)
         else:
-            num = -1 * (int(self.correct_answer) + 1)
+            num = 0
             for i in range(2):
                 exclude = [num]
                 while True:
-                    num = random.randint(-1 * int(self.correct_answer) // 2,
-                                         int(self.correct_answer) // 2)  # floor division
-                    # by 2 so the number isn't too far off so less easy to rule out answers
+                    num = random.randint(-(2**self.num_bits), (self.num_bits))
                     if num not in exclude:
                         break
                 temp = int(self.correct_answer) + num
                 self.plausible_answers.append(temp)
         random.shuffle(self.plausible_answers)
-        """
+
 
 
 class HexToDec(Question):  # hexidecimal to binary
@@ -229,7 +227,7 @@ class HexToDec(Question):  # hexidecimal to binary
         bits = ""
         self.type = random.choice(self.types)
         if self.type == "htd":
-            for i in range(self.num_hex_chars):
+            for i in range(int(self.num_hex_chars)):
                 bits = bits + random.choice(self.chars)
         else:
             bits = random.randint(0, 2 ** self.num_bits - 1)
@@ -259,14 +257,14 @@ class HexToDec(Question):  # hexidecimal to binary
             j = 16 ** (self.num_hex_chars - 1)
             hexadecimal = ""
             decimal = int(self.question)
-            while decimal > 0:
-                remainder = decimal % 16
-                hexadecimal += #######
-                decimal = decimal // 16
-                j /= 16
+            #################################
+
             self.correct_answer = hexadecimal
 
         self.plausible_answers.append(self.correct_answer)
+
+    def generate_plausible_answers(self):
+        pass
 
 
 
