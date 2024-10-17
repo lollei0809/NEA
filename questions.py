@@ -118,6 +118,8 @@ class UnsignedQuestion(Question):
                 self.plausible_answers.append(temp)
         random.shuffle(self.plausible_answers)
 
+    def __str__(self):
+        return f'UnsignedQuestion(question={self.question}, answer={self.correct_answer})'
 
 class SignAndMagnitude(Question):
     def __init__(self):
