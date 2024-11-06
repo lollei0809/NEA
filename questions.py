@@ -137,9 +137,9 @@ class SignAndMagnitude(Question):
 
     def generate_question_phrase(self):
         if self.question_type == "smtd":
-            self.question_phrase = f"convert this sign and magnitude binary number{self.question} to decimal"
+            self.question_phrase = f"convert this sign and magnitude binary number {self.question} to decimal"
         else:
-            self.question_phrase = f"convert this decimal number{self.question} to sign and magnitude binary"
+            self.question_phrase = f"convert this decimal number {self.question} to sign and magnitude binary"
 
     def generate_correct_answer(self):
         self.correct_answer = ""

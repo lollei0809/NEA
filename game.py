@@ -11,19 +11,19 @@ class GamePlay():
         self.score = 0
         self.question_type = ""
 
-"""    
-    def signin(self):
-        username = input("username:")
-        password = getpass("password(hidden whilst typing):")
 
-    def signup(self):
-        name = input("name:")
-        username = input("username:")
-        password = getpass("password(hidden whilst typing):")
-        string = password.encode('utf-8')
-        salt = bcrypt.gensalt()
-        self.hash_password = bcrypt.hashpw(string, salt)
-"""
+    # def signin(self):
+    #     username = input("username:")
+    #     password = getpass("password(hidden whilst typing):")
+    #
+    # def signup(self):
+    #     name = input("name:")
+    #     username = input("username:")
+    #     password = getpass("password(hidden whilst typing):")
+    #     string = password.encode('utf-8')
+    #     salt = bcrypt.gensalt()
+    #     self.hash_password = bcrypt.hashpw(string, salt)
+    #
 
     def gen_question(self):
         self.question = UnsignedQuestion()
