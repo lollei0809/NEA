@@ -1,21 +1,14 @@
 from getpass import getpass  # when using getpass you must edit the configurations to emulate terminal in output console
 import bcrypt
-
-
+from game import GamePlay
+import json_data_store
 class User:
     def __init__(self):
         self.name = ""
         self.username = ""
         self.password = ""
         self.hashed_password = ""
-        self.details = {
-            "lolly123": {"password": "asdf",
-                         "unsigned_high_score": 5,
-                         },
-            "john123": {"password": "qwerty",
-                        "unsigned_high_score": 5,
-                        }
-        }
+
 
     def get_username_password(self):
         self.username = input("username: ")
@@ -27,20 +20,26 @@ class User:
         self.hashed_password = bcrypt.hashpw(string, salt)
 
     def check_password(self):
-        return self.hashed_password == self.hash_password(self.details[self.username]["password"])
+        return bcrypt.checkpw(json_datga_store.details[self.username]["password"].encode('utf-8'), self.hashed_password)
 
     def save_details(self):
-        self.details.update({self.username})
+        json_datga_store.details[self.username] = {
+            "name": self.name,
+            "password": self.password,
+        }
 
     def sign_in(self):
+        self.get_username_password()
+        self.hash_password(self.password)
         while not self.check_password():
+            print("username or password incorrect")
             self.get_username_password()
             self.hash_password(self.password)
-        return "successful sign-in"
+        print("username and password found. Successful sign-in")
 
     def sign_up(self):
         self.name = input("name: ")
         self.get_username_password()
         self.hash_password(self.password)
         self.save_details()
-        return "details saved, signed up"
+        print("details saved, signed up")
