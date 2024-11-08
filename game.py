@@ -1,3 +1,4 @@
+from typing import Optional
 from questions import Question, UnsignedQuestion
 from user import User
 
@@ -6,7 +7,7 @@ class GamePlay():
     def __init__(self):
         self.user_answer: str = ""  # type hint and set default to empty string
         self.username: str = ""
-        self.question: Question
+        self.question: Optional[Question] = None # self.question can be none or a question object or its subclasses
         self.score = 0
         self.question_type = ""
 
