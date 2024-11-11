@@ -46,7 +46,6 @@ class UnsignedQuestion(Question):
 
     def generate_question(self):
         bits = ""
-        self.question_type = random.choice(self.types)  # decimal to binary or binary to decimal
         if self.question_type == "dtb":
             self.question = random.randint(0, 2 ** self.num_bits - 1)
         else:
@@ -126,7 +125,6 @@ class SignAndMagnitude(Question):
 
     def generate_question(self):
         bits = ""
-        self.question_type = random.choice(self.types)
         if self.question_type == "dtsm":
             self.question = random.randint(int(-1 * (((2 ** self.num_bits) / 2) - 1)), (2 ** self.num_bits) / 2)
             # ^ generates decimal numbers eg. for 8 bits, -127 to 128
@@ -226,7 +224,6 @@ class HexToDec(Question):  # hexidecimal to binary
 
     def generate_question(self):
         bits = ""
-        self.type = random.choice(self.types)
         if self.type == "htd":
             for i in range(int(self.num_hex_chars)):
                 bits = bits + random.choice(self.key_list)
