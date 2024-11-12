@@ -42,11 +42,11 @@ class UnsignedQuestion(Question):
     def __init__(self):
         super().__init__()  # Call the parent constructor
         self.num_bits = 8
-        self.types = ["dtb", "btd"]
+        self.types = ["dtub", "ubtd"]
 
     def generate_question(self):
         bits = ""
-        if self.question_type == "dtb":
+        if self.question_type == "udtb":
             self.question = random.randint(0, 2 ** self.num_bits - 1)
         else:
             for i in range(self.num_bits):
@@ -63,7 +63,7 @@ class UnsignedQuestion(Question):
 
     def generate_correct_answer(self):
         self.correct_answer = ""
-        if self.question_type == "dtb":
+        if self.question_type == "dtub":
             j = 2 ** (self.num_bits - 1)
             total = ""
             temp = int(self.question)
@@ -86,7 +86,7 @@ class UnsignedQuestion(Question):
         self.plausible_answers.append(self.correct_answer)
 
     def generate_plausible_answers(self):
-        if self.question_type == "dtb":
+        if self.question_type == "dtub":
             bit_index = -1
             for i in range(2):
                 exclude = [bit_index]
@@ -198,13 +198,12 @@ class SignAndMagnitude(Question):
             for i in range(2):
                 exclude = [num]
                 while True:
-                    num = random.randint(-(2**self.num_bits), (self.num_bits))
+                    num = random.randint(-(2 ** self.num_bits), (self.num_bits))
                     if num not in exclude:
                         break
                 temp = int(self.correct_answer) + num
                 self.plausible_answers.append(temp)
         random.shuffle(self.plausible_answers)
-
 
 
 class HexToDec(Question):  # hexidecimal to binary
