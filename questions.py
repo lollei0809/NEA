@@ -3,14 +3,14 @@ from abc import ABC, abstractmethod
 
 
 class Question(ABC):  # abstract base class which other question objects inherit from
-    def __init__(self):
+    def __init__(self, type_acr):
         self.plausible_answers = []
         self.correct_answer = ""
         self.user_answer = ""
         self.question = ""
         self.question_phrase = ""
         self.question_phrases = []
-        self.question_type = ""
+        self.question_type = type_acr
 
     @abstractmethod
     def generate_question_phrase(self):
@@ -46,7 +46,7 @@ class UnsignedQuestion(Question):
 
     def generate_question(self):
         bits = ""
-        if self.question_type == "udtb":
+        if self.question_type == "dtub":
             self.question = random.randint(0, 2 ** self.num_bits - 1)
         else:
             for i in range(self.num_bits):
@@ -86,34 +86,24 @@ class UnsignedQuestion(Question):
         self.plausible_answers.append(self.correct_answer)
 
     def generate_plausible_answers(self):
-        if self.question_type == "dtub":
-            bit_index = -1
-            for i in range(2):
-                exclude = [bit_index]
-                while True:
-                    bit_index = random.randint(0, self.num_bits - 1)
-                    if bit_index not in exclude:  # excludes the number that has already been used so plausible answers
-                        # doesnt have duplicates
-                        break
-                temp = list(self.correct_answer)  # passing mutable objects calls by reference?
-                if temp[bit_index] == "0":
-                    temp[bit_index] = "1"
-                else:
-                    temp[bit_index] = "0"
-                t = "".join(temp)
-                self.plausible_answers.append(t)
+        plausible_answers_set = {self.correct_answer}#prevent duplicates
+
+        if self.question_type == "dtub":#flips a random bit in the binary
+            while len(plausible_answers_set) < 3:
+                bit_index = random.randint(0, self.num_bits - 1)
+                temp = list(self.correct_answer)
+                temp[bit_index] = "1" if temp[bit_index] == "0" else "0"
+                plausible_answer = "".join(temp)
+                plausible_answers_set.add(plausible_answer)#will ignore if it is a duplicate
         else:
-            num = -1 * (int(self.correct_answer) + 1)
-            for i in range(2):
-                exclude = [num]
-                while True:
-                    num = random.randint(-1 * int(self.correct_answer) // 2,
-                                         int(self.correct_answer) // 2)  # floor division
-                    # by 2 so the number isn't too far off so less easy to rule out answers
-                    if num not in exclude:
-                        break
-                temp = int(self.correct_answer) + num
-                self.plausible_answers.append(temp)
+            while len(plausible_answers_set) < 3:
+                plausible_answer = 256#out of range
+                while plausible_answer < 0 or plausible_answer > 255:
+                    offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
+                    plausible_answer = int(self.correct_answer) + offset
+                plausible_answers_set.add(str(plausible_answer))
+
+        self.plausible_answers = list(plausible_answers_set)
         random.shuffle(self.plausible_answers)
 
 
@@ -177,34 +167,25 @@ class SignAndMagnitude(Question):
         self.plausible_answers.append(self.correct_answer)
 
     def generate_plausible_answers(self):
-        if self.question_type == "dtsm":
-            bit_index = -1
-            for i in range(2):
-                exclude = [bit_index]
-                while True:
-                    bit_index = random.randint(0, self.num_bits - 1)
-                    if bit_index not in exclude:  # excludes the number that has already been used so plausible answers
-                        # doesnt have duplicates
-                        break
-                temp = list(self.correct_answer)  # passing mutable objects calls by reference?
-                if temp[bit_index] == "0":
-                    temp[bit_index] = "1"
-                else:
-                    temp[bit_index] = "0"
-                t = "".join(temp)
-                self.plausible_answers.append(t)
-        else:
-            num = 0
-            for i in range(2):
-                exclude = [num]
-                while True:
-                    num = random.randint(-(2 ** self.num_bits), (self.num_bits))
-                    if num not in exclude:
-                        break
-                temp = int(self.correct_answer) + num
-                self.plausible_answers.append(temp)
-        random.shuffle(self.plausible_answers)
+        plausible_answers_set = {self.correct_answer} #prevent duplicates
 
+        if self.question_type == "dtsm": #flips a random bit in the binary
+            while len(plausible_answers_set) < 3:
+                bit_index = random.randint(0, self.num_bits - 1)
+                temp = list(self.correct_answer)
+                temp[bit_index] = "1" if temp[bit_index] == "0" else "0"
+                plausible_answer = "".join(temp)
+                plausible_answers_set.add(plausible_answer)#will ignore if it is a duplicate
+        else:#
+            while len(plausible_answers_set) < 3:
+                plausible_answer = 128#out of range
+                while plausible_answer < -127 or plausible_answer > 127:
+                    offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
+                    plausible_answer = int(self.correct_answer) + offset
+                plausible_answers_set.add(str(plausible_answer))
+
+        self.plausible_answers = list(plausible_answers_set)
+        random.shuffle(self.plausible_answers)
 
 class HexToDec(Question):  # hexidecimal to binary
     def __init__(self):
@@ -222,13 +203,13 @@ class HexToDec(Question):  # hexidecimal to binary
         self.val_list = list(self.chars.values())
 
     def generate_question(self):
-        bits = ""
+        digits = ""
         if self.type == "htd":
             for i in range(int(self.num_hex_chars)):
-                bits = bits + random.choice(self.key_list)
+                digits = digits + random.choice(self.key_list)
         else:
-            bits = random.randint(0, 2 ** self.num_bits - 1)
-        self.question = bits
+            digits = random.randint(0, 2 ** self.num_bits - 1)
+        self.question = digits
 
     def generate_question_phrase(self):
         if self.type == "htd":
@@ -263,30 +244,21 @@ class HexToDec(Question):  # hexidecimal to binary
         self.plausible_answers.append(self.correct_answer)
 
     def generate_plausible_answers(self):
-        if self.type == "htd":  # Hexadecimal to Decimal
-            correct_decimal = int(self.correct_answer)
+        plausible_answers_set = {self.correct_answer}#prevent duplicates
 
-            # Generate two unique alternative decimal answers
-            while len(self.plausible_answers) < 3:
-                offset = random.randint(1, 5)  # Small offset to keep answers close
-                plausible_answer = correct_decimal + random.choice([-offset, offset])
+        if self.question_type == "dth":
+            while len(plausible_answers_set) < 3:
+                hexdigits = ""
+                for i in range(int(self.num_hex_chars)):
+                    hexdigits += random.choice(self.key_list)
+                plausible_answers_set.add(str(hexdigits))
+        else:
+            while len(plausible_answers_set) < 3:
+                plausible_answer = 256#out of range of two digit hex
+                while plausible_answer < 0 or plausible_answer > 255:
+                    offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
+                    plausible_answer = int(self.correct_answer) + offset
+                plausible_answers_set.add(str(plausible_answer))
 
-                # Ensure the answer is unique
-                if str(plausible_answer) not in self.plausible_answers:
-                    self.plausible_answers.append(str(plausible_answer))
-
-        else:  # Decimal to Hexadecimal
-            correct_decimal = int(self.question)
-
-            # Generate two unique alternative hexadecimal values
-            while len(self.plausible_answers) < 3:
-                offset = random.randint(1, 3)  # Small offset for close hexadecimal values
-                plausible_decimal = correct_decimal + random.choice([-offset, offset])
-                plausible_hex = hex(plausible_decimal)[2:].upper()  # Convert to hexadecimal and format
-
-                # Ensure the answer is unique
-                if plausible_hex not in self.plausible_answers:
-                    self.plausible_answers.append(plausible_hex)
-
-        # Shuffle plausible answers to randomize their order
+        self.plausible_answers = list(plausible_answers_set)
         random.shuffle(self.plausible_answers)

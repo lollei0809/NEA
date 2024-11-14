@@ -27,13 +27,13 @@ class GamePlay():
         # pyip doesnt have function to return a number, it returns the value so i check back in the dictionary
         self.type_acr = self.types[self.type]
 
-    def gen_question(self):#after question type is chosen. need to add acronym to question.type
+    def gen_question(self):#after question type is chosen.
         if self.type_acr in ["dtub", "ubtd"]:
-            self.question = UnsignedQuestion()
+            self.question = UnsignedQuestion(self.type_acr)
         elif self.type_acr in ["smtd", "dtsm"]:
-            self.question = SignAndMagnitude()
+            self.question = SignAndMagnitude(self.type_acr)
         elif self.type_acr in ["htd", "dth"]:
-            self.question = HexToDec()
+            self.question = HexToDec(self.type_acr)
         else:
             print("incorrect acronym")
         self.question.run()
@@ -41,7 +41,7 @@ class GamePlay():
     def get_answer(self):
         user_answer = "!"
         while user_answer not in self.question.plausible_answers:
-            user_answer = input(f'{self.question.question_phrase} {self.question.plausible_answers}')
+            user_answer = int(input(f'{self.question.question_phrase} {self.question.plausible_answers}'))
         self.question.user_answer = user_answer
 
     def update_score(self, ):
@@ -62,6 +62,15 @@ class GamePlay():
         else:
             self.user.sign_out()
 
-# if __name__ == "__main__":
-#     game = GamePlay()
-#     game.signup()
+if __name__ == "__main__":
+    game = GamePlay()
+    game.define_user()
+    repeat = "yes"
+    while repeat == "yes":
+        game.get_question_type()
+        game.gen_question()
+        game.get_answer()
+        game.update_score()
+        repeat = pyip.inputYesNo(prompt="do you want annother question?:")
+
+    print(f"GAME OVER\nSCORE:{game.score}\nHIGH SCORE:{game.user.details[game.user.username]['high_score']}")

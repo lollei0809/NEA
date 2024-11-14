@@ -1,0 +1,7 @@
+13/11/2024:
+-   created main guard with implementation of CLI
+-   discovered the question type did not get the correct conversion (ubtd instead of dtub)-->
+    now trying to make the type_acr a parameter of the question class to initialise the type correctly
+-   discovered a duplicate in a set of plausible answers-->
+    checking over duplicate handling in create plausible answers-->
+    use set data structure to more cleanly ensure no duplicates.
