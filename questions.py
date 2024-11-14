@@ -39,10 +39,13 @@ class Question(ABC):  # abstract base class which other question objects inherit
 
 
 class UnsignedQuestion(Question):
-    def __init__(self):
-        super().__init__()  # Call the parent constructor
+    allowed_types = {"dtub":"str", "ubtd":"int"}#class attribute can be called even if no instance of the class
+    #type for the answer
+
+    def __init__(self, type_acr):
+        super().__init__(type_acr)  # Call the parent constructor
         self.num_bits = 8
-        self.types = ["dtub", "ubtd"]
+        # self.allowed_types = ["dtub", "ubtd"]
 
     def generate_question(self):
         bits = ""
@@ -108,9 +111,9 @@ class UnsignedQuestion(Question):
 
 
 class SignAndMagnitude(Question):
-    def __init__(self):
-        super().__init__()  # Call the parent constructor
-        self.types = ["smtd", "dtsm"]
+    allowed_types = {"smtd":"int", "dtsm":"str"}
+    def __init__(self,type_acr):
+        super().__init__(type_acr)  # Call the parent constructor
         self.num_bits = 8
 
     def generate_question(self):
@@ -188,13 +191,12 @@ class SignAndMagnitude(Question):
         random.shuffle(self.plausible_answers)
 
 class HexToDec(Question):  # hexidecimal to binary
-    def __init__(self):
-        super().__init__()  # Call the parent constructor
-        self.types = ["htd", "dth"]
+    allowed_types = {"htd":"int", "dth":"str"}
+    def __init__(self,type_acr):
+        super().__init__(type_acr)  # Call the parent constructor
         self.type = ""
         self.num_bits = 8
         self.num_hex_chars = self.num_bits / 4
-        self.question_phrase = ""
         self.chars = {'0': 0, '1': 1, '2': 2, '3': 3,
                       '4': 4, '5': 5, '6': 6, '7': 7,
                       '8': 8, '9': 9, 'A': 10, 'B': 11,

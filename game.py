@@ -24,15 +24,14 @@ class GamePlay():
         self.type = pyip.inputMenu(list(self.types.keys()),
                                    prompt="enter question type (1-6):\n",
                                    numbered=True)
-        # pyip doesnt have function to return a number, it returns the value so i check back in the dictionary
         self.type_acr = self.types[self.type]
 
-    def gen_question(self):#after question type is chosen.
-        if self.type_acr in ["dtub", "ubtd"]:
+    def gen_question(self):#after question type is chosen
+        if self.type_acr in UnsignedQuestion.allowed_types.keys():
             self.question = UnsignedQuestion(self.type_acr)
-        elif self.type_acr in ["smtd", "dtsm"]:
+        elif self.type_acr in SignAndMagnitude.allowed_types.keys():
             self.question = SignAndMagnitude(self.type_acr)
-        elif self.type_acr in ["htd", "dth"]:
+        elif self.type_acr in HexToDec.allowed_types.keys():
             self.question = HexToDec(self.type_acr)
         else:
             print("incorrect acronym")
@@ -41,13 +40,18 @@ class GamePlay():
     def get_answer(self):
         user_answer = "!"
         while user_answer not in self.question.plausible_answers:
-            user_answer = int(input(f'{self.question.question_phrase} {self.question.plausible_answers}'))
+            if self.question.allowed_types[self.type_acr] == "int":
+                user_answer = int(input(f'{self.question.question_phrase} {self.question.plausible_answers}'))
+            else:
+                user_answer = input(f'{self.question.question_phrase} {self.question.plausible_answers}')
         self.question.user_answer = user_answer
 
     def update_score(self, ):
         if self.question.check_answer():
+            print("correct")
             self.score += 1
         else:
+            print("incorrect")
             self.score -= 1
 
     def define_user(self):
@@ -62,6 +66,11 @@ class GamePlay():
         else:
             self.user.sign_out()
 
+    def update_high_score(self):
+        if self.score > self.user.details[self.user.username]["high score"]:
+            print("new high score")
+            self.user.details[self.user.username]["high score"] = self.score
+
 if __name__ == "__main__":
     game = GamePlay()
     game.define_user()
@@ -73,4 +82,5 @@ if __name__ == "__main__":
         game.update_score()
         repeat = pyip.inputYesNo(prompt="do you want annother question?:")
 
-    print(f"GAME OVER\nSCORE:{game.score}\nHIGH SCORE:{game.user.details[game.user.username]['high_score']}")
+    print(f"GAME OVER\nSCORE:{game.score}\n")
+    game.update_high_score()

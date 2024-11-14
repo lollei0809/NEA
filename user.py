@@ -1,6 +1,6 @@
 from getpass import getpass  # when using getpass you must edit the configurations to emulate terminal in output console
 import bcrypt
-import json_data_store
+from json_data_store import details
 
 
 
@@ -10,13 +10,7 @@ class User:
         self.name = ""
         self.username = ""
         self.password = ""
-        self.details = {  # will be converted to json
-            "jane123": {"name": "Jane Doe",
-                        "hashed_password": b'$2b$12$Rg1AfE9GqoGU5fs6biZmf.IWf188pRLVFr40tKqGXwIJzTrIoM1GW',  # asdf
-                        "signed_in": False,
-                        "high_score": 5,
-                        },
-        }
+        self.details = details
 
     def get_username_password(self):
         self.username = input("username: ")

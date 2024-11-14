@@ -5,3 +5,6 @@
 -   discovered a duplicate in a set of plausible answers-->
     checking over duplicate handling in create plausible answers-->
     use set data structure to more cleanly ensure no duplicates.
+14/11/2024:
+-   added class attribute for allowed types
+-   need to fix checking the user answer. enter int or str
