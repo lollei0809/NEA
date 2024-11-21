@@ -104,7 +104,7 @@ class UnsignedQuestion(Question):
                 while plausible_answer < 0 or plausible_answer > 255:
                     offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
                     plausible_answer = int(self.correct_answer) + offset
-                plausible_answers_set.add(str(plausible_answer))
+                plausible_answers_set.add(plausible_answer)
 
         self.plausible_answers = list(plausible_answers_set)
         random.shuffle(self.plausible_answers)
@@ -185,7 +185,7 @@ class SignAndMagnitude(Question):
                 while plausible_answer < -127 or plausible_answer > 127:
                     offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
                     plausible_answer = int(self.correct_answer) + offset
-                plausible_answers_set.add(str(plausible_answer))
+                plausible_answers_set.add(plausible_answer)
 
         self.plausible_answers = list(plausible_answers_set)
         random.shuffle(self.plausible_answers)
@@ -260,7 +260,7 @@ class HexToDec(Question):  # hexidecimal to binary
                 while plausible_answer < 0 or plausible_answer > 255:
                     offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
                     plausible_answer = int(self.correct_answer) + offset
-                plausible_answers_set.add(str(plausible_answer))
+                plausible_answers_set.add(plausible_answer)
 
         self.plausible_answers = list(plausible_answers_set)
         random.shuffle(self.plausible_answers)

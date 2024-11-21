@@ -8,7 +8,8 @@ class GamePlay():
     def __init__(self):
         self.user: Optional[User] = None
         self.question: Optional[Question] = None  # self.question can be none or a question object or its subclasses
-        self.score = 0
+        self.correct = 0
+        self.incorrect = 0
         self.type_acr = ""
         self.type = ""
         self.types: dict = {}
@@ -26,7 +27,7 @@ class GamePlay():
                                    numbered=True)
         self.type_acr = self.types[self.type]
 
-    def gen_question(self):#after question type is chosen
+    def gen_question(self):  # after question type is chosen
         if self.type_acr in UnsignedQuestion.allowed_types.keys():
             self.question = UnsignedQuestion(self.type_acr)
         elif self.type_acr in SignAndMagnitude.allowed_types.keys():
@@ -40,36 +41,40 @@ class GamePlay():
     def get_answer(self):
         user_answer = "!"
         while user_answer not in self.question.plausible_answers:
-            if self.question.allowed_types[self.type_acr] == "int":
+            if self.question.allowed_types[self.type_acr] == "int":  # question parent class has no attribute allowed
+                # types but its subclasses do. here the question type is already estblished in gen question.
                 user_answer = int(input(f'{self.question.question_phrase} {self.question.plausible_answers}'))
             else:
                 user_answer = input(f'{self.question.question_phrase} {self.question.plausible_answers}')
         self.question.user_answer = user_answer
 
-    def update_score(self, ):
+    def update_scores(self, ):
         if self.question.check_answer():
             print("correct")
-            self.score += 1
+            self.correct += 1
         else:
             print("incorrect")
-            self.score -= 1
+            self.incorrect += 1
 
     def define_user(self):
         self.user = User()
-        option = pyip.inputMenu(["sign in", "sign up", "sign out"],
-                                prompt="enter an option(1-3):\n",
+        option = pyip.inputMenu(["sign in", "sign up"],
+                                prompt="enter an option(1-2):\n",
                                 numbered=True)
         if option == "sign in":
             self.user.sign_in()
-        elif option == "sign up":
-            self.user.sign_up()
         else:
-            self.user.sign_out()
+            self.user.sign_up()
 
-    def update_high_score(self):
-        if self.score > self.user.details[self.user.username]["high score"]:
-            print("new high score")
-            self.user.details[self.user.username]["high score"] = self.score
+    def update_recorded_scores(self):
+        self.user.details[self.user.username][self.type]["correct"].append(self.correct)
+        self.user.details[self.user.username][self.type]["incorrect"].append(self.incorrect)
+
+    def calc_average_correct(self,type):
+        pass
+    def recommend_question(self):
+        pass
+
 
 if __name__ == "__main__":
     game = GamePlay()
@@ -79,8 +84,8 @@ if __name__ == "__main__":
         game.get_question_type()
         game.gen_question()
         game.get_answer()
-        game.update_score()
+        game.update_scores()
         repeat = pyip.inputYesNo(prompt="do you want annother question?:")
-
-    print(f"GAME OVER\nSCORE:{game.score}\n")
-    game.update_high_score()
+    game.user.sign_out()
+    print(f"GAME OVER\nCORRECT:{game.correct}\nINCORRECT:{game.incorrect}")
+    game.update_recorded_scores()

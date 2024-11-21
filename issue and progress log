@@ -3,8 +3,17 @@
 -   discovered the question type did not get the correct conversion (ubtd instead of dtub)-->
     now trying to make the type_acr a parameter of the question class to initialise the type correctly
 -   discovered a duplicate in a set of plausible answers-->
-    checking over duplicate handling in create plausible answers-->
-    use set data structure to more cleanly ensure no duplicates.
+    checking over duplicate handling in create plausible answers
+--> use set data structure to more cleanly ensure no duplicates.
 14/11/2024:
 -   added class attribute for allowed types
--   need to fix checking the user answer. enter int or str
+-   fixed checking the user answer. entering int or str
+21/11/24:
+-   removed getpass
+-   made sign in handle incorrect usernames and passwords
+-   ensuring incorrect plausible answers are correct type (int not str for base 10)
+-   changed score to num correct and incorrect and recorded high score accordingly
+--> randomly serve question and weight it towards questions the user got wrong
+--> calc_average_correct method to use in automatic question type selection
+--> recommend_question method
+--> turn details dict into json
