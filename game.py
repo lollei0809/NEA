@@ -72,6 +72,7 @@ class GamePlay():
 
     def calc_average_correct(self,type):
         pass
+
     def recommend_question(self):
         pass
 
