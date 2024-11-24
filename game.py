@@ -52,12 +52,15 @@ class GamePlay():
         if self.question.check_answer():
             print("correct")
             self.correct += 1
+            # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
         else:
             print("incorrect")
             self.incorrect += 1
+            # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
 
     def define_user(self):
         self.user = User()
+        self.user.get_details()
         option = pyip.inputMenu(["sign in", "sign up"],
                                 prompt="enter an option(1-2):\n",
                                 numbered=True)
@@ -67,10 +70,10 @@ class GamePlay():
             self.user.sign_up()
 
     def update_recorded_scores(self):
-        self.user.details[self.user.username][self.type]["correct"].append(self.correct)
-        self.user.details[self.user.username][self.type]["incorrect"].append(self.incorrect)
+        self.user.details_dict[self.user.username][self.type]["correct"].append(self.correct)
+        self.user.details_dict[self.user.username][self.type]["incorrect"].append(self.incorrect)
 
-    def calc_average_correct(self,type):
+    def calc_average_correct(self, type):
         pass
 
     def recommend_question(self):
@@ -80,13 +83,23 @@ class GamePlay():
 if __name__ == "__main__":
     game = GamePlay()
     game.define_user()
-    repeat = "yes"
-    while repeat == "yes":
-        game.get_question_type()
+    game.get_question_type()
+    while True:
         game.gen_question()
         game.get_answer()
         game.update_scores()
-        repeat = pyip.inputYesNo(prompt="do you want annother question?:")
-    game.user.sign_out()
-    print(f"GAME OVER\nCORRECT:{game.correct}\nINCORRECT:{game.incorrect}")
+        go = input("continue?")
+        if go == "no":
+            break
+        same_type = input("same type?")
+        if same_type == "no":
+            game.update_recorded_scores()
+            game.correct = 0
+            game.incorrect = 0
+            game.get_question_type()
+
+    print(f"GAME OVER")
     game.update_recorded_scores()
+    game.user.save_details_dict_to_json()
+    game.user.sign_out()
+

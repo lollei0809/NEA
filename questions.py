@@ -181,9 +181,9 @@ class SignAndMagnitude(Question):
                 plausible_answers_set.add(plausible_answer)#will ignore if it is a duplicate
         else:#
             while len(plausible_answers_set) < 3:
-                plausible_answer = 128#out of range
+                plausible_answer = 128 #out of range
                 while plausible_answer < -127 or plausible_answer > 127:
-                    offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
+                    offset = random.randint(-1 * abs(int(self.correct_answer)) // 2, abs(int(self.correct_answer)) // 2)
                     plausible_answer = int(self.correct_answer) + offset
                 plausible_answers_set.add(plausible_answer)
 
@@ -243,7 +243,7 @@ class HexToDec(Question):  # hexidecimal to binary
                 j /= 16
             self.correct_answer = hexadecimal
 
-        self.plausible_answers.append(self.correct_answer)
+        self.plausible_answers.append(int(self.correct_answer))
 
     def generate_plausible_answers(self):
         plausible_answers_set = {self.correct_answer}#prevent duplicates

@@ -1,15 +1,21 @@
 import bcrypt
-from json_data_store import details
+import json
+
 
 class User:
     def __init__(self):
         self.name = ""
         self.username = ""
         self.password = ""
-        self.details = details
+        self.details_dict = {}
+
+    def get_details(self):
+        with open("details.json", mode="r", encoding="utf-8") as read_file:
+            self.details_dict = json.load(read_file)
 
     def get_username(self):
         self.username = input("username: ")
+
     def get_password(self):
         self.password = input("password: ")
 
@@ -20,38 +26,37 @@ class User:
 
     def check_password(self):
         string = self.password.encode('utf-8')
-        return bcrypt.checkpw(string, self.details[self.username]["hashed_password"])
+        return bcrypt.checkpw(string, self.details_dict[self.username]["hashed_password"].encode('utf-8'))
 
-    def save_details(self):
-        self.details[self.username] = {
-            "name": self.name,
-            "hashed_password": self.hash_password(self.password),
-            "signed_in": True
-        }
+    def save_details_dict_to_json(self):
+        with open("details.json", mode="w", encoding="utf-8") as write_file:
+            json.dump(self.details_dict, write_file, indent=4)
 
     def sign_in(self):
         self.get_username()
-        while self.username not in self.details.keys():
+        while self.username not in self.details_dict.keys():
             print("username incorrect")
             self.get_username()
         self.get_password()
         while not self.check_password():
             print("password incorrect")
             self.get_password()
-        self.details[self.username]["signed_in"] = True
+        self.details_dict[self.username]["signed_in"] = True
+        self.name = self.details_dict[self.username]["name"]
         print("username and password found. Successful sign-in")
-
-
 
     def sign_out(self):
         if self.username == "":
             print("not signed in")
         else:
-            self.details[self.username]["signed_in"] = False
+            self.details_dict[self.username]["signed_in"] = False
+        self.name = ""
+        self.username = ""
+        self.password = ""
 
     def check_signed_in(self):
-        if self.username in self.details.keys:
-            return self.details[self.username]["signed_in"]
+        if self.username in self.details_dict.keys():
+            return self.details_dict[self.username]["signed_in"]
         else:
             return False
 
@@ -59,5 +64,15 @@ class User:
         self.name = input("name: ")
         self.get_username()
         self.get_password()
-        self.save_details()
+        self.details_dict[self.username] = {
+            "name": self.name,
+            "hashed_password": self.hash_password(self.password).decode("utf-8"),
+            "signed_in": True,
+            "unsigned binary to decimal": {"correct": [0], "incorrect": [0]},
+            "decimal to unsigned binary": {"correct": [0], "incorrect": [0]},
+            "sign and magnitude binary to decimal": {"correct": [0], "incorrect": [0]},
+            "decimal to sign and magnitude binary": {"correct": [0], "incorrect": [0]},
+            "hexadecimal to decimal": {"correct": [0], "incorrect": [0]},
+            "decimal to hexadecimal": {"correct": [0], "incorrect": [0]}
+        }
         print("details saved, signed up")

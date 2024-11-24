@@ -17,3 +17,9 @@
 --> calc_average_correct method to use in automatic question type selection
 --> recommend_question method
 --> turn details dict into json
+22/11/24
+-   attempt to integrate json file. can work through console to change num corect incorrect
+    and put that in correct location in json file
+--> make sure main guard can navigate functions properly
+24/11/24
+-   began
