@@ -18,8 +18,11 @@
 --> recommend_question method
 --> turn details dict into json
 22/11/24
--   attempt to integrate json file. can work through console to change num corect incorrect
+-   attempt to integrate json file. can work through console to change num correct incorrect
     and put that in correct location in json file
---> make sure main guard can navigate functions properly
+-   made sure main guard can navigate functions properly
+-   worked from real python working with json data. the "interacting with json" could give
+    suggestions for the evaluation section on areas to improve
 24/11/24
--   began
+-   calc average correct with exception handling
+-   began recommend question method
