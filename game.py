@@ -2,6 +2,7 @@ from typing import Optional
 import pyinputplus as pyip
 from questions import Question, UnsignedQuestion, SignAndMagnitude, HexToDec
 from user import User
+import random
 
 
 class GamePlay():
@@ -12,9 +13,6 @@ class GamePlay():
         self.incorrect = 0
         self.type_acr = ""
         self.type = ""
-        self.types: dict = {}
-
-    def get_question_type(self):
         self.types = {"unsigned binary to decimal": "ubtd",
                       "decimal to unsigned binary": "dtub",
                       "sign and magnitude binary to decimal": "smtd",
@@ -22,9 +20,14 @@ class GamePlay():
                       "hexadecimal to decimal": "htd",
                       "decimal to hexadecimal": "dth"}
 
-        self.type = pyip.inputMenu(list(self.types.keys()),
+    def get_question_type(self):
+        recommend = pyip.inputYesNo("do you want questions based on past scores?")
+        if recommend == "no":
+            self.type = pyip.inputMenu(list(self.types.keys()),
                                    prompt="enter question type (1-6):\n",
                                    numbered=True)
+        else:
+            self.type = self.recommend_question()
         self.type_acr = self.types[self.type]
 
     def gen_question(self):  # after question type is chosen
@@ -81,20 +84,23 @@ class GamePlay():
         for item in self.user.details_dict[self.user.username][type]["incorrect"]:
             incorrect_sum += item
         try:
-            percent = 100*correct_sum/(correct_sum+incorrect_sum)
+            percent = 100 * correct_sum / (correct_sum + incorrect_sum)
         except ZeroDivisionError:
             percent = 0
-        return f"{percent}% correct"
+        return round(percent, 1)
+
     def recommend_question(self):
         percentages = []
-        for type in self.types.keys():
-            percentages.append(self.calc_average_correct(type))
-        return percentages
+        for item in self.types.keys():
+            percentages.append(self.calc_average_correct(item))
+        #make waitings if no questions answered start 50%
+        choice = random.choices(self.types.keys(), weights=percentages, cum_weights=None)
+        return choice
 
-
-# if __name__ == "__main__":
-#     game = GamePlay()
-#     game.define_user()
+if __name__ == "__main__":
+    game = GamePlay()
+    game.define_user()
+    game.recommend_question()
 #     game.get_question_type()
 #     while True:
 #         game.gen_question()
@@ -113,5 +119,5 @@ class GamePlay():
 #     print(f"GAME OVER")
 #     game.update_recorded_scores()
 #     game.user.save_details_dict_to_json()
+#     game.recommend_question()
 #     game.user.sign_out()
-

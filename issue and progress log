@@ -23,6 +23,8 @@
 -   made sure main guard can navigate functions properly
 -   worked from real python working with json data. the "interacting with json" could give
     suggestions for the evaluation section on areas to improve
-24/11/24
+25/11/24
 -   calc average correct with exception handling
 -   began recommend question method
+28/11/24
+-   work on reccomend question algithm
