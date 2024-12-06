@@ -84,17 +84,19 @@ class GamePlay():
         for item in self.user.details_dict[self.user.username][type]["incorrect"]:
             incorrect_sum += item
         try:
-            percent = 100 * correct_sum / (correct_sum + incorrect_sum)
+            percent = correct_sum / (correct_sum + incorrect_sum)
         except ZeroDivisionError:
             percent = 0
-        return round(percent, 1)
+        return round(percent, 2)
 
     def recommend_question(self):
-        percentages = []
+        decimals = []
         for item in self.types.keys():
-            percentages.append(self.calc_average_correct(item))
-        #make waitings if no questions answered start 50%
-        choice = random.choices(self.types.keys(), weights=percentages, cum_weights=None)
+            decimals.append(self.calc_average_correct(item))
+        #make weightings if no questions answered start 50%
+        for decimal in decimals:
+            decimal = 1-decimal # reverses so mostly correct is low decimal so less likely to be chosen
+        choice = random.choices(self.types.keys(), weights=decimals, cum_weights=None)
         return choice
 
 if __name__ == "__main__":

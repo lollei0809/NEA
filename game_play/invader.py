@@ -19,8 +19,8 @@ MAX_BULLETS = 5
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('../Assets/Sprites/spaceship.png')
-        self.image = pygame.transform.scale(self.image, (50, 20))
+        self.image = pygame.image.load('../assets/sprites/spaceship.png')
+        self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect = self.image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.9))
 
     def shoot(self):

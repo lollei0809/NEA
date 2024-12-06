@@ -28,3 +28,10 @@
 -   began recommend question method
 28/11/24
 -   work on reccomend question algithm
+5/12/24
+-   begin GUI
+-   game class with main loop, input handling, game logic and drawing
+-   need to have a way to choose a background color
+-   problem with pygame that it will not have any packaged up buttons, just areas on the screen that can be clicked:
+-   use a tkinter sign in / set up
+-   continual loops in both tkinter and pygame so shut down tkinter before running pygame
