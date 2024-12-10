@@ -35,3 +35,6 @@
 -   problem with pygame that it will not have any packaged up buttons, just areas on the screen that can be clicked:
 -   use a tkinter sign in / set up
 -   continual loops in both tkinter and pygame so shut down tkinter before running pygame
+10/12/24
+--> use pygame rects instead of vector2 as velocities not needed, 1d movement.
+--> easily change speeds at higher levels by increasing clock tick

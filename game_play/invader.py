@@ -13,13 +13,13 @@ from pygame import (
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 600
 PLAYER_SPEED = 10
-MAX_BULLETS = 5
+MAX_BULLETS = 50
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('../assets/sprites/spaceship.png')
+        self.image = pygame.image.load('../assets/sprites/rocket2.png')
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect = self.image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.9))
 
@@ -80,7 +80,7 @@ class SpaceInvaders:
             self.player.update(1)
 
     def _process_game_logic(self):
-        self.clock.tick(60)
+        self.clock.tick(100)
         self.bullets.update()
 
     def _draw(self):
