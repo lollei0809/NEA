@@ -38,3 +38,11 @@
 10/12/24
 --> use pygame rects instead of vector2 as velocities not needed, 1d movement.
 --> easily change speeds at higher levels by increasing clock tick
+12/12/24
+-   changing from vector form as each object is only moving in 1 dimension
+29/12/24
+-   now can move the spaceship with arrowkeys
+-   and can move in 2 dimentions idk what i was thinking on the 12th
+-   added "friction" to help control the spaceships movents
+-   need to work out how to delete the bullet objects when they reach the top
+and then use that same method to delete the bullet and answers when they collide.
