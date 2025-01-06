@@ -1,7 +1,11 @@
 from typing import Optional
 import pyinputplus as pyip
+
 from questions import Question, UnsignedQuestion, SignAndMagnitude, HexToDec
 from user import User
+from pygame_game import WIDTH, HEIGHT, load_image, load_sound, GameObject, Spaceship, Bullet, Answer, Game, TextBox
+from tkinter_page import App, Choice, Log_in, Sign_in, Sign_up, Settings
+
 import random
 
 
@@ -96,30 +100,30 @@ class GamePlay():
         #make weightings if no questions answered start 50%
         for decimal in decimals:
             decimal = 1-decimal # reverses so mostly correct is low decimal so less likely to be chosen
-        choice = random.choices(self.types.keys(), weights=decimals, cum_weights=None)
+        choice = random.choices(list(self.types.keys()), weights=decimals, cum_weights=None)
         return choice
 
 if __name__ == "__main__":
     game = GamePlay()
     game.define_user()
     game.recommend_question()
-#     game.get_question_type()
-#     while True:
-#         game.gen_question()
-#         game.get_answer()
-#         game.update_scores()
-#         go = input("continue?")
-#         if go == "no":
-#             break
-#         same_type = input("same type?")
-#         if same_type == "no":
-#             game.update_recorded_scores()
-#             game.correct = 0
-#             game.incorrect = 0
-#             game.get_question_type()
-#
-#     print(f"GAME OVER")
-#     game.update_recorded_scores()
-#     game.user.save_details_dict_to_json()
-#     game.recommend_question()
-#     game.user.sign_out()
+    # game.get_question_type()
+    # while True:
+    #     game.gen_question()
+    #     game.get_answer()
+    #     game.update_scores()
+    #     go = input("continue?")
+    #     if go == "no":
+    #         break
+    #     same_type = input("same type?")
+    #     if same_type == "no":
+    #         game.update_recorded_scores()
+    #         game.correct = 0
+    #         game.incorrect = 0
+    #         game.get_question_type()
+    #
+    # print(f"GAME OVER")
+    # game.update_recorded_scores()
+    # game.user.save_details_dict_to_json()
+    # game.recommend_question()
+    # game.user.sign_out()

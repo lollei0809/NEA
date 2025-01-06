@@ -4,6 +4,7 @@ import json
 
 class User:
     def __init__(self):
+        self.signed_in = None
         self.name = ""
         self.username = ""
         self.password = ""
@@ -32,6 +33,9 @@ class User:
         with open("details.json", mode="w", encoding="utf-8") as write_file:
             json.dump(self.details_dict, write_file, indent=4)
 
+
+
+
     def sign_in(self):
         self.get_username()
         while self.username not in self.details_dict.keys():
@@ -44,6 +48,7 @@ class User:
         self.details_dict[self.username]["signed_in"] = True
         self.name = self.details_dict[self.username]["name"]
         print("username and password found. Successful sign-in")
+        self.signed_in = True
 
     def sign_out(self):
         if self.username == "":
@@ -53,6 +58,7 @@ class User:
         self.name = ""
         self.username = ""
         self.password = ""
+        self.signed_in = False
 
     def check_signed_in(self):
         if self.username in self.details_dict.keys():
@@ -61,9 +67,7 @@ class User:
             return False
 
     def sign_up(self):
-        self.name = input("name: ")
-        self.get_username()
-        self.get_password()
+        self.signed_in = True
         self.details_dict[self.username] = {
             "name": self.name,
             "hashed_password": self.hash_password(self.password).decode("utf-8"),
@@ -75,4 +79,4 @@ class User:
             "hexadecimal to decimal": {"correct": [0], "incorrect": [0]},
             "decimal to hexadecimal": {"correct": [0], "incorrect": [0]}
         }
-        print("details saved, signed up")
+

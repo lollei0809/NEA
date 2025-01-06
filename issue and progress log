@@ -46,3 +46,32 @@
 -   added "friction" to help control the spaceships movents
 -   need to work out how to delete the bullet objects when they reach the top
 and then use that same method to delete the bullet and answers when they collide.
+--> if removed from bullets list maybe that removes all refereces and so it is effectively deleted?
+30/12/24
+-   added more to the bullet move so if it goes out of frame it is removed
+-   added check collision method to game class whcih removes bullets and answers from lists if they collide
+-   added to check collision so if correct answer reaches the bottom game over and if answer meets spaceship gameover
+-   added score to game class that is incremented when correct answer is shot
+--> need to print text to the screen to show the level, score, and when they lose
+1/1/2025
+-   began tkinter for the signin and game settings
+--> need to work out how to sign in vs sign up
+2/1/2025
+-   included frames in tkinter app for the sign in/up option, sign in,  sign up and game settings
+-   linked play button on settings page to start the pygame
+--> need to change color before window is created and game begins so game= Game() then change color then play
+3/1/2025
+--> cant get the order of clicking the color button and starting up pygame and running the main loop
+--> putting game = Game() when the settings frame is opened starts an empty pygame frame
+-   added set color method to pygame so it can be changed outside the __init__
+-   added attribute self.color to tkinter app and the pygame is set up and run when play is pressed
+-   added green purple and yellow backgeounds
+4/1/2025
+-   added options for sounds
+--> a bullet reaching the top of the screen in tkinter_page makes error as "game" is not defined?
+--> join user to tkinter sign in/out frames
+-   updated go to settings method in app to use user functionality and check for password/ add user
+--> currently controlling the pygame and user in the tkinter file so maybe need separate controller to involve question
+--> modify game.py to include the tkinter and pygame, export some of the methods in the app classof the tkinter
+-   added text box class to display the num correct incorrect high score question
+-   added game over screen when a correct answer reaches the bottom or all the answers are shot

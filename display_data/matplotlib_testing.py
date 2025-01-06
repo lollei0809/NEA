@@ -3,8 +3,8 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 import matplotlib.pyplot as plt
 import numpy as np
-import tkinter as tk
-from tkinter import ttk
+import tkinter_page as tk
+from tkinter_page import ttk
 
 
 class App(tk.Tk):
