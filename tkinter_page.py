@@ -30,6 +30,7 @@ class App(tk.Tk):
         self.sign_in_frame = Sign_in(self, width=400, height=300)
         self.sign_up_frame = Sign_up(self, width=400, height=300)
         self.settings_frame = Settings(self, width=400, height=300)
+        self.tutorial_frame = Tutorial(self, width=400, height=300)
 
         self.pack_frames()
 
@@ -53,6 +54,16 @@ class App(tk.Tk):
         self.sign_up_frame.grid_forget()
         self.settings_frame.grid_forget()
         self.choice_frame.grid()
+        self.choice_frame.place_widgets()
+
+    def back_to_settings(self):
+        self.choice_frame.grid_forget()
+        self.sign_in_frame.grid_forget()
+        self.sign_up_frame.grid_forget()
+        self.tutorial_frame.grid_forget()
+        self.settings_frame.grid()
+        self.settings_frame.place_widgets()
+
 
     def check_details(self):
         self.user = User()
@@ -87,6 +98,15 @@ class App(tk.Tk):
         self.choice_frame.grid_forget()
         self.settings_frame.grid()
         self.settings_frame.place_widgets()
+
+    def go_to_tut(self):
+        self.sign_in_frame.grid_forget()
+        self.sign_up_frame.grid_forget()
+        self.choice_frame.grid_forget()
+        self.settings_frame.grid_forget()
+        self.tutorial_frame.grid()
+        self.tutorial_frame.place_widgets()
+
 
     def change_color(self, color):
         print(f"Changing color to {color}")  # Placeholder for changing background in pygame
@@ -193,7 +213,7 @@ class Settings(tk.Frame):
         self.boing_btn = tk.Button(self, text="boing noise", command=lambda: self.app.change_sound("boing"))
 
         self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_choice)
-        self.play_btn = tk.Button(self, text="PLAY!", command=self.app.play, bg="green")
+        self.next_btn = tk.Button(self, text="next", command=self.app.go_to_tut)
 
     def place_widgets(self):
         self.red_btn.grid(row=0, column=0, **self.settings)
@@ -206,6 +226,27 @@ class Settings(tk.Frame):
         self.click_btn.grid(row=1, column=2, **self.app.settings)
         self.boing_btn.grid(row=1, column=3, **self.app.settings)
 
+        self.back_btn.grid(row=2, column=1, **self.settings)
+        self.next_btn.grid(row=2, column=3, **self.settings)
+
+class Tutorial(tk.Frame):
+    def __init__(self, app, width, height):
+        super().__init__(app, width=width, height=height)
+        self.settings = {'padx': 10, 'pady': 10}
+        self.app = app
+
+        self.tut_txt = tk.Message(self,text="binary game tutorial!\nAIMS:\nshoot down the correct answer before it "
+                                            "reaches the bottom of the screen to increase the 'correct' score. "
+                                            "you have 2 chances to find the correct answer\nMOVEMENT:\nuse the arrow "
+                                            "keys to move the spaceship around and the space bar to shoot"
+                                            "\nWATCHOUT:\nif you shoot down both incorrect answers or let the correct "
+                                            "answer reach the bottom, GAME OVER.  ")#message text or label: message for non editable multiline text
+
+        self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_settings)
+        self.play_btn = tk.Button(self, text="PLAY!", command=self.app.play, bg="green")
+
+    def place_widgets(self):
+        self.tut_txt.grid(row=1, column=1,columnspan=2,  **self.settings)
         self.back_btn.grid(row=2, column=1, **self.settings)
         self.play_btn.grid(row=2, column=3, **self.settings)
 

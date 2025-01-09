@@ -30,9 +30,10 @@ class GamePlay():
             self.type = pyip.inputMenu(list(self.types.keys()),
                                    prompt="enter question type (1-6):\n",
                                    numbered=True)
+            self.type_acr = self.types[self.type]
         else:
-            self.type = self.recommend_question()
-        self.type_acr = self.types[self.type]
+            self.type_acr = self.recommend_question()
+
 
     def gen_question(self):  # after question type is chosen
         if self.type_acr in UnsignedQuestion.allowed_types.keys():
@@ -98,32 +99,32 @@ class GamePlay():
         for item in self.types.keys():
             decimals.append(self.calc_average_correct(item))
         #make weightings if no questions answered start 50%
-        for decimal in decimals:
-            decimal = 1-decimal # reverses so mostly correct is low decimal so less likely to be chosen
-        choice = random.choices(list(self.types.keys()), weights=decimals, cum_weights=None)
+        for i in range(len(decimals)):
+            decimals[i] = 1 - decimals[i] # reverses so mostly correct is low decimal so less likely to be chosen
+        choice = random.choices(list(self.types.keys()), weights=decimals)
         return choice
 
 if __name__ == "__main__":
     game = GamePlay()
     game.define_user()
     game.recommend_question()
-    # game.get_question_type()
-    # while True:
-    #     game.gen_question()
-    #     game.get_answer()
-    #     game.update_scores()
-    #     go = input("continue?")
-    #     if go == "no":
-    #         break
-    #     same_type = input("same type?")
-    #     if same_type == "no":
-    #         game.update_recorded_scores()
-    #         game.correct = 0
-    #         game.incorrect = 0
-    #         game.get_question_type()
-    #
-    # print(f"GAME OVER")
-    # game.update_recorded_scores()
-    # game.user.save_details_dict_to_json()
-    # game.recommend_question()
-    # game.user.sign_out()
+    game.get_question_type()
+    while True:
+        game.gen_question()
+        game.get_answer()
+        game.update_scores()
+        go = input("continue?")
+        if go == "no":
+            break
+        same_type = input("same type?")
+        if same_type == "no":
+            game.update_recorded_scores()
+            game.correct = 0
+            game.incorrect = 0
+            game.get_question_type()
+
+    print(f"GAME OVER")
+    print()
+    game.update_recorded_scores()
+    game.user.save_details_dict_to_json()
+    game.user.sign_out()
