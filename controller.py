@@ -24,16 +24,12 @@ class GamePlay():
                       "hexadecimal to decimal": "htd",
                       "decimal to hexadecimal": "dth"}
 
-    def get_question_type(self):
-        recommend = pyip.inputYesNo("do you want questions based on past scores?")
-        if recommend == "no":
-            self.type = pyip.inputMenu(list(self.types.keys()),
-                                   prompt="enter question type (1-6):\n",
-                                   numbered=True)
+    def get_question_type(self, recommend, type ):
+        if recommend == "yes":
+            type = self.recommend_question()
+        if type in self.types.keys():
             self.type_acr = self.types[self.type]
-        else:
-            self.type_acr = self.recommend_question()
-
+            self.type = type
 
     def gen_question(self):  # after question type is chosen
         if self.type_acr in UnsignedQuestion.allowed_types.keys():
@@ -43,35 +39,27 @@ class GamePlay():
         elif self.type_acr in HexToDec.allowed_types.keys():
             self.question = HexToDec(self.type_acr)
         else:
-            print("incorrect acronym")
+            return "incorrect acronym"
         self.question.run()
 
-    def get_answer(self):
-        user_answer = "!"
-        while user_answer not in self.question.plausible_answers:
-            if self.question.allowed_types[self.type_acr] == "int":  # question parent class has no attribute allowed
-                # types but its subclasses do. here the question type is already estblished in gen question.
-                user_answer = int(input(f'{self.question.question_phrase} {self.question.plausible_answers}'))
-            else:
-                user_answer = input(f'{self.question.question_phrase} {self.question.plausible_answers}')
-        self.question.user_answer = user_answer
+    def set_answer(self, answer):
+        self.question.user_answer = answer
 
     def update_scores(self, ):
         if self.question.check_answer():
-            print("correct")
             self.correct += 1
+            return "correct"
+
             # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
         else:
-            print("incorrect")
             self.incorrect += 1
+            return "incorrect"
+
             # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
 
-    def define_user(self):
+    def define_user(self, option):
         self.user = User()
         self.user.get_details()
-        option = pyip.inputMenu(["sign in", "sign up"],
-                                prompt="enter an option(1-2):\n",
-                                numbered=True)
         if option == "sign in":
             self.user.sign_in()
         else:
@@ -103,28 +91,3 @@ class GamePlay():
             decimals[i] = 1 - decimals[i] # reverses so mostly correct is low decimal so less likely to be chosen
         choice = random.choices(list(self.types.keys()), weights=decimals)
         return choice
-
-if __name__ == "__main__":
-    game = GamePlay()
-    game.define_user()
-    game.recommend_question()
-    game.get_question_type()
-    while True:
-        game.gen_question()
-        game.get_answer()
-        game.update_scores()
-        go = input("continue?")
-        if go == "no":
-            break
-        same_type = input("same type?")
-        if same_type == "no":
-            game.update_recorded_scores()
-            game.correct = 0
-            game.incorrect = 0
-            game.get_question_type()
-
-    print(f"GAME OVER")
-    print()
-    game.update_recorded_scores()
-    game.user.save_details_dict_to_json()
-    game.user.sign_out()
