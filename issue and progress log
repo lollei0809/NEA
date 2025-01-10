@@ -75,3 +75,6 @@ and then use that same method to delete the bullet and answers when they collide
 --> modify game.py to include the tkinter and pygame, export some of the methods in the app classof the tkinter
 -   added text box class to display the num correct incorrect high score question
 -   added game over screen when a correct answer reaches the bottom or all the answers are shot
+10/1/2025
+-   split game into controller and CLI
+--> need to fix type error unhcashable list in gen question type and recommend question

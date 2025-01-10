@@ -28,8 +28,9 @@ class GamePlay():
         if recommend == "yes":
             type = self.recommend_question()
         if type in self.types.keys():
-            self.type_acr = self.types[self.type]
             self.type = type
+            self.type_acr = self.types[self.type]
+
 
     def gen_question(self):  # after question type is chosen
         if self.type_acr in UnsignedQuestion.allowed_types.keys():
@@ -90,4 +91,5 @@ class GamePlay():
         for i in range(len(decimals)):
             decimals[i] = 1 - decimals[i] # reverses so mostly correct is low decimal so less likely to be chosen
         choice = random.choices(list(self.types.keys()), weights=decimals)
-        return choice
+        #choice is returned as list with 1 item
+        return choice[0]

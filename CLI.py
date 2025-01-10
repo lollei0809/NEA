@@ -29,7 +29,7 @@ if __name__ == "__main__":
             else:
                 user_answer = input(f'{game.question.question_phrase} {game.question.plausible_answers}')
         game.set_answer(user_answer)
-        game.update_scores()
+        print(game.update_scores())
         go = input("continue?")
         if go == "no":
             break
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     print(f"GAME OVER")
     print(f"correct: {game.correct}")
-    print('incorrect: {game.incorrect}')
+    print(f'incorrect: {game.incorrect}')
     game.update_recorded_scores()
     game.user.save_details_dict_to_json()
     game.user.sign_out()
