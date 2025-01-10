@@ -78,3 +78,4 @@ and then use that same method to delete the bullet and answers when they collide
 10/1/2025
 -   split game into controller and CLI
 --> need to fix type error unhcashable list in gen question type and recommend question
+--> need to import controller, and the tkinter and pygame into GUI to play like in the CLI

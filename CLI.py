@@ -1,10 +1,6 @@
 from controller import GamePlay
 import pyinputplus as pyip
 
-
-
-
-
 if __name__ == "__main__":
     game = GamePlay()
     option = pyip.inputMenu(["sign in", "sign up"],

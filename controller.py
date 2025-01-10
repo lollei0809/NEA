@@ -12,7 +12,7 @@ import random
 class GamePlay():
     def __init__(self):
         self.user: Optional[User] = None
-        self.question: Optional[Question] = None  # self.question can be none or a question object or its subclasses
+        self.question: Optional[Question] = None # self.question can be none or a question object or its subclasses
         self.correct = 0
         self.incorrect = 0
         self.type_acr = ""
@@ -23,6 +23,7 @@ class GamePlay():
                       "decimal to sign and magnitude binary": "dtsm",
                       "hexadecimal to decimal": "htd",
                       "decimal to hexadecimal": "dth"}
+
 
     def get_question_type(self, recommend, type ):
         if recommend == "yes":
