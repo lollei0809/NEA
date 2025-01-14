@@ -16,15 +16,17 @@ WIDTH = 1000
 HEIGHT = 600
 
 
-
 def load_image(name, size):
     destination = f"assets/sprites/{name}.png"
     image = pygame.image.load(destination)
     image = pygame.transform.scale(image, size)
     return image.convert_alpha()
+
+
 def load_sound(name):
     path = f"assets/sounds/{name}.wav"
     return Sound(path)
+
 
 class GameObject():
     def __init__(self, position, sprite, velocity):
@@ -83,6 +85,7 @@ class Bullet(GameObject):
         if self.position.y <= -5:
             game.bullets.remove(self)
 
+
 class TextBox:
     def __init__(self, text, position, font_size=24, color=(255, 255, 255)):
         self.text = text
@@ -92,13 +95,14 @@ class TextBox:
         self.font = pygame.font.Font(None, font_size)
         self.size = self.font.size(self.text)
 
-
     def draw(self, surface):
         # Render the text without the rectangle
         rendered_text = self.font.render(self.text, True, self.color)
         surface.blit(rendered_text, self.position)
+
     def update_text(self, new_text):
         self.text = new_text
+
 
 class Game:
     def __init__(self):
@@ -108,24 +112,22 @@ class Game:
         self.initialise_pygame()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
-        self.background = load_image("red", (WIDTH, HEIGHT))#default red
+        self.background = load_image("red", (WIDTH, HEIGHT))  # default red
         self.spaceship = Spaceship((WIDTH / 2, 550))
         self.answers = [[Answer((WIDTH / 4, 0)), Answer((WIDTH / 2, 0)), Answer((3 * WIDTH / 4, 0))]]
         self.bullets = []
 
-        self.correct_box = TextBox("correct: 0",(0, HEIGHT-20))
-        self.incorrect_box = TextBox("incorrect: 1",(220,HEIGHT-20))
-        self.instruction_box = TextBox("question here",(0, 0))
+        self.correct_box = TextBox("correct: 0", (0, HEIGHT - 20))
+        self.incorrect_box = TextBox("incorrect: 1", (220, HEIGHT - 20))
+        self.instruction_box = TextBox("question here", (0, 0))
 
         self.paused = False
-        self.pause_button = TextBox("Pause",(WIDTH-50,0))
+        self.pause_button = TextBox("Pause", (WIDTH - 50, 0))
         self.level = 0
         self.game_over = False
 
         self.gameover_sound = load_sound("game_over")
         self.play_sound = True
-
-
 
     def main_loop(self):
 
@@ -149,13 +151,11 @@ class Game:
                 bullet_position[1] -= 40
                 self.bullets.append(Bullet(tuple(bullet_position)))
             if event.type == pygame.MOUSEBUTTONDOWN:
-                x_min,y_min = self.pause_button.position
+                x_min, y_min = self.pause_button.position
                 x_max = x_min + self.pause_button.size[0]
-                y_max = y_min+self.pause_button.size[1]
+                y_max = y_min + self.pause_button.size[1]
                 if x_max > event.pos[0] > x_min and y_max > event.pos[1] > y_min:
                     self.paused = not self.paused
-
-
 
         # update player on the basis of pressed keys
         pressed_keys = pygame.key.get_pressed()
@@ -184,21 +184,21 @@ class Game:
         else:
             self.pause_button.text = "Play"
 
-        if self.correct >= (self.level+10):
+        if self.correct >= (self.level + 10):
             self.level += 10
             for trio in self.answers:
                 for answer in trio:
                     answer.velocity += (0, 0.1)
 
         for trio in self.answers:
-            if len(trio)!=0:
-                if trio[0].position.y == HEIGHT-20:
-                    self.answers.append([Answer((random.randint(0,333), 0)),
-                                         Answer((random.randint(333,666), 0)),
-                                         Answer((random.randint(666,1000), 0))
+            if len(trio) != 0:
+                if trio[0].position.y == HEIGHT - 20:
+                    self.answers.append([Answer((random.randint(0, 333), 0)),
+                                         Answer((random.randint(333, 666), 0)),
+                                         Answer((random.randint(666, 1000), 0))
                                          ])
             else:
-                self.game_over=True
+                self.game_over = True
 
     def draw_game_elements(self):
         if self.game_over:
@@ -206,10 +206,10 @@ class Game:
                 self.play_sound = False
                 self.gameover_sound.play()
             self.screen.fill((0, 0, 0))
-            gameover_text = TextBox("GAME OVER",(200,200),100,(255,0,0))
+            gameover_text = TextBox("GAME OVER", (200, 200), 100, (255, 0, 0))
             self.calc_percent()
-            percentage_text = TextBox(f"percentage correct: {self.percentage}%",(200,300),24,(0,255,0))
-            self.correct_box.position, self.correct_box.font_size, self.correct_box.color =(200,350),24,(0,255,0)
+            percentage_text = TextBox(f"percentage correct: {self.percentage}%", (200, 300), 24, (0, 255, 0))
+            self.correct_box.position, self.correct_box.font_size, self.correct_box.color = (200, 350), 24, (0, 255, 0)
             gameover_text.draw(self.screen)
             percentage_text.draw(self.screen)
             self.correct_box.draw(self.screen)
@@ -240,14 +240,14 @@ class Game:
                         trio.remove(answer)
                         if answer.correct:
                             self.correct += 1
-                            self.correct_box.text_color = (0,255,0)
+                            self.correct_box.text_color = (0, 255, 0)
                         else:
                             self.incorrect += 1
                             self.correct_box.text_color = (255, 0, 0)
                         break
         # check correct answer and bottom
         for trio in self.answers[:]:
-            if len(trio)!=0:
+            if len(trio) != 0:
                 if trio[0].position.y >= HEIGHT + 50:
                     for answer in trio:
                         if answer.correct:
@@ -258,7 +258,7 @@ class Game:
                     print("GAME OVER reached bottom")
                     print(self.correct)
             else:
-                self.game_over=True
+                self.game_over = True
 
     def set_color(self, color="red"):
         self.background = load_image(color, (WIDTH, HEIGHT))

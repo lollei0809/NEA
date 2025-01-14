@@ -7,14 +7,14 @@ from typing import Optional
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-
         self.password = ""
         self.username = ""
         self.name = ""
+
         self.existing_user: bool
         self.user: Optional[User] = None
-
         self.game: Optional[pygame_game.Game] = None
+
         self.color = ""
         self.sound = ""
 
@@ -64,7 +64,6 @@ class App(tk.Tk):
         self.settings_frame.grid()
         self.settings_frame.place_widgets()
 
-
     def check_details(self):
         self.user = User()
         self.user.get_details()
@@ -107,13 +106,12 @@ class App(tk.Tk):
         self.tutorial_frame.grid()
         self.tutorial_frame.place_widgets()
 
-
     def change_color(self, color):
         print(f"Changing color to {color}")  # Placeholder for changing background in pygame
         self.color = color
 
     def change_sound(self, sound):
-        print(f"Changing sound to {sound}")  # Placeholder for changing background in pygame
+        print(f"Changing sound to {sound}")  # Placeholder for changing sound in pygame
         self.sound = sound
 
     def play(self):
@@ -229,24 +227,25 @@ class Settings(tk.Frame):
         self.back_btn.grid(row=2, column=1, **self.settings)
         self.next_btn.grid(row=2, column=3, **self.settings)
 
+
 class Tutorial(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.settings = {'padx': 10, 'pady': 10}
         self.app = app
 
-        self.tut_txt = tk.Message(self,text="binary game tutorial!\nAIMS:\nshoot down the correct answer before it "
-                                            "reaches the bottom of the screen to increase the 'correct' score. "
-                                            "you have 2 chances to find the correct answer\nMOVEMENT:\nuse the arrow "
-                                            "keys to move the spaceship around and the space bar to shoot"
-                                            "\nWATCHOUT:\nif you shoot down both incorrect answers or let the correct "
-                                            "answer reach the bottom, GAME OVER.  ")#message text or label: message for non editable multiline text
+        self.tut_txt = tk.Message(self, text="binary game tutorial!\nAIMS:\nshoot down the correct answer before it "
+                                             "reaches the bottom of the screen to increase the 'correct' score. "
+                                             "you have 2 chances to find the correct answer\nMOVEMENT:\nuse the arrow "
+                                             "keys to move the spaceship around and the space bar to shoot"
+                                             "\nWATCHOUT:\nif you shoot down both incorrect answers or let the correct "
+                                             "answer reach the bottom, GAME OVER.  ")  # message text or label: message for non editable multiline text
 
         self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_settings)
         self.play_btn = tk.Button(self, text="PLAY!", command=self.app.play, bg="green")
 
     def place_widgets(self):
-        self.tut_txt.grid(row=1, column=1,columnspan=2,  **self.settings)
+        self.tut_txt.grid(row=1, column=1, columnspan=2, **self.settings)
         self.back_btn.grid(row=2, column=1, **self.settings)
         self.play_btn.grid(row=2, column=3, **self.settings)
 

@@ -66,7 +66,7 @@ and then use that same method to delete the bullet and answers when they collide
 -   added set color method to pygame so it can be changed outside the __init__
 -   added attribute self.color to tkinter app and the pygame is set up and run when play is pressed
 -   added green purple and yellow backgeounds
-4/1/2025
+5/1/2025
 -   added options for sounds
 --> a bullet reaching the top of the screen in tkinter_page makes error as "game" is not defined?
 --> join user to tkinter sign in/out frames
@@ -75,3 +75,9 @@ and then use that same method to delete the bullet and answers when they collide
 --> modify game.py to include the tkinter and pygame, export some of the methods in the app classof the tkinter
 -   added text box class to display the num correct incorrect high score question
 -   added game over screen when a correct answer reaches the bottom or all the answers are shot
+9/1/25
+--> as the score increases, speed up game
+10/1/2025
+-   split game into controller and CLI
+--> need to fix type error unhcashable list in gen question type and recommend question
+--> need to import controller, and the tkinter and pygame into GUI to play like in the CLI
