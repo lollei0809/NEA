@@ -1,7 +1,6 @@
 from pygame_game import WIDTH, HEIGHT, load_image, load_sound, GameObject, Spaceship, Bullet, Answer, Game, TextBox
 from tkinter_page import App, ChoiceFrame, LogInFrame, SignInFrame, SignUpFrame, SettingsFrame
 from controller import ControlGame
-from user import User
 from questions import Question, UnsignedQuestion, SignAndMagnitude, HexToDec
 from typing import Optional
 
@@ -27,5 +26,6 @@ class GUI:
 
 if __name__ == '__main__':
     game_controller = ControlGame()
-    tk_app = App(game_controller)
-    tk_app.mainloop()
+    gui = GUI(game_controller)
+    gui.run_tk()
+    gui.run_pyg()

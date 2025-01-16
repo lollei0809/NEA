@@ -71,19 +71,13 @@ class Spaceship(GameObject):
 
 class Answer(GameObject):
     def __init__(self, position):
-        super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 0.5)))
+        super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 1 )))
         self.correct = False
 
 
 class Bullet(GameObject):
     def __init__(self, position):
         super().__init__(position, load_image("bullet", (30, 30)), pygame.math.Vector2((0, -10)))
-
-    def move(self):
-        super().move()
-        # if hits top of screen remove from bullet list
-        if self.position.y <= -5:
-            game.bullets.remove(self)
 
 
 class TextBox:
@@ -255,10 +249,13 @@ class Game:
 
                     self.answers.remove(trio)
 
-                    print("GAME OVER reached bottom")
-                    print(self.correct)
+                    print("GAME OVER, correct reached bottom")
             else:
                 self.game_over = True
+        #check bullet and top of screen
+        for bullet in self.bullets:
+            if bullet.position.y <= -5:
+                self.bullets.remove(bullet)
 
     def set_color(self, color="red"):
         self.background = load_image(color, (WIDTH, HEIGHT))

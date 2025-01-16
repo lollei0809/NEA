@@ -82,3 +82,5 @@ and then use that same method to delete the bullet and answers when they collide
 --> need to fix type error unhcashable list in gen question type and recommend question
 --> need to import controller, and the tkinter and pygame into GUI to play like in the CLI
 -   sorted out sign in by putting username and password from tk through the controller then user
+-   lilly says shoot the wrong ones so the right one can reach the ground
+-   run tk then pygame in GUI by adding self.quit() to pygame.

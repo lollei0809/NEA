@@ -1,5 +1,4 @@
 import tkinter as tk
-import pygame_game
 from controller import ControlGame
 from user import User
 from typing import Optional
@@ -14,10 +13,8 @@ class App(tk.Tk):
         self.username = ""
         self.name = ""
 
-        self.close = False
 
         self.user: Optional[User] = None
-        self.game: Optional[pygame_game.Game] = None
 
         self.color = ""
         self.sound = ""
@@ -78,7 +75,6 @@ class App(tk.Tk):
             self.sign_in_frame.try_again_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
             # display this on frame and resubmit next_btn press
 
-
     def add_user(self):
         name = self.sign_up_frame.name.get()
         username = self.sign_up_frame.username.get()
@@ -114,7 +110,7 @@ class App(tk.Tk):
         self.sound = sound
 
     def close(self):
-        self.close = True  # GUI can now close tkinter window
+        self.quit()
 
 
 class ChoiceFrame(tk.Frame):
