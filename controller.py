@@ -52,13 +52,13 @@ class ControlGame:
 
             # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
 
-    def define_user(self, option):
+    def define_user(self, option, name: None, username, password):
         self.user = User()
         self.user.get_details()
         if option == "sign in":
-            self.user.sign_in()
+            return self.user.sign_in(username, password)
         else:
-            self.user.sign_up()
+            self.user.sign_up(name, username, password)
 
     def update_recorded_scores(self):
         self.user.details_dict[self.user.username][self.type]["correct"].append(self.correct)

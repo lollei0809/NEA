@@ -65,7 +65,7 @@ and then use that same method to delete the bullet and answers when they collide
 --> putting game = Game() when the settings frame is opened starts an empty pygame frame
 -   added set color method to pygame so it can be changed outside the __init__
 -   added attribute self.color to tkinter app and the pygame is set up and run when play is pressed
--   added green purple and yellow backgeounds
+-   added green purple and yellow backgrounds
 5/1/2025
 -   added options for sounds
 --> a bullet reaching the top of the screen in tkinter_page makes error as "game" is not defined?
@@ -81,3 +81,4 @@ and then use that same method to delete the bullet and answers when they collide
 -   split game into controller and CLI
 --> need to fix type error unhcashable list in gen question type and recommend question
 --> need to import controller, and the tkinter and pygame into GUI to play like in the CLI
+-   sorted out sign in by putting username and password from tk through the controller then user

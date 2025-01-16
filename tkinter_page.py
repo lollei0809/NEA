@@ -1,17 +1,21 @@
 import tkinter as tk
 import pygame_game
+from controller import ControlGame
 from user import User
 from typing import Optional
 
 
 class App(tk.Tk):
-    def __init__(self):
+    def __init__(self, controller):
         super().__init__()
+        self.controller = controller
+
         self.password = ""
         self.username = ""
         self.name = ""
 
-        self.existing_user: bool
+        self.close = False
+
         self.user: Optional[User] = None
         self.game: Optional[pygame_game.Game] = None
 
@@ -26,11 +30,11 @@ class App(tk.Tk):
         self.resizable(False, False)  # Prevent resizing
 
         # Frames
-        self.choice_frame = Choice(self, width=400, height=300)
-        self.sign_in_frame = Sign_in(self, width=400, height=300)
-        self.sign_up_frame = Sign_up(self, width=400, height=300)
-        self.settings_frame = Settings(self, width=400, height=300)
-        self.tutorial_frame = Tutorial(self, width=400, height=300)
+        self.choice_frame = ChoiceFrame(self, width=400, height=300)
+        self.sign_in_frame = SignInFrame(self, width=400, height=300)
+        self.sign_up_frame = SignUpFrame(self, width=400, height=300)
+        self.settings_frame = SettingsFrame(self, width=400, height=300)
+        self.tutorial_frame = TutorialFrame(self, width=400, height=300)
 
         self.pack_frames()
 
@@ -38,13 +42,11 @@ class App(tk.Tk):
         self.choice_frame.grid()
 
     def sign_in(self):
-        self.existing_user = True
         self.choice_frame.grid_forget()
         self.sign_in_frame.grid()
         self.sign_in_frame.place_widgets()
 
     def sign_up(self):
-        self.existing_user = True
         self.choice_frame.grid_forget()
         self.sign_up_frame.grid()
         self.sign_up_frame.place_widgets()
@@ -65,29 +67,26 @@ class App(tk.Tk):
         self.settings_frame.place_widgets()
 
     def check_details(self):
-        self.user = User()
-        self.user.get_details()
-        self.user.username = self.sign_in_frame.username.get()
-        self.user.password = self.sign_in_frame.password.get()
-        if self.user.username not in self.user.details_dict.keys() or not self.user.check_password():
-            self.sign_in_frame.try_again_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
-            # display this on frame and resubmit next_btn press
-        else:
-            self.user.details_dict[self.user.username]["signed_in"] = True
-            self.user.name = self.user.details_dict[self.user.username]["name"]
-            self.user.signed_in = True
+        username = self.sign_in_frame.username.get()
+        password = self.sign_in_frame.password.get()
+
+        if self.controller.define_user(option="sign in", name=None, username=username, password=password):#if the user is found
             self.sign_in_frame.try_again_txt.grid_forget()
             self.sign_in_frame.success_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
             self.sign_in_frame.next_btn.grid(row=3, column=2, **self.settings)
+        else:
+            self.sign_in_frame.try_again_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
+            # display this on frame and resubmit next_btn press
+
 
     def add_user(self):
-        self.user = User()
-        self.user.get_details()
-        self.user.name = self.sign_up_frame.name.get()
-        self.user.username = self.sign_up_frame.username.get()
-        self.user.password = self.sign_up_frame.password.get()
-        self.user.sign_up()
-        print(self.user.details_dict)
+        name = self.sign_up_frame.name.get()
+        username = self.sign_up_frame.username.get()
+        password = self.sign_up_frame.password.get()
+
+        self.controller.define_user(option="sign up", name=name, username=username, password=password)
+        print(self.controller.user.details_dict)
+
         self.sign_up_frame.success_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
         self.sign_up_frame.next_btn.grid(row=3, column=2, **self.settings)
 
@@ -114,18 +113,11 @@ class App(tk.Tk):
         print(f"Changing sound to {sound}")  # Placeholder for changing sound in pygame
         self.sound = sound
 
-    def play(self):
-        self.quit()  # closes tkinter window
-
-        self.game = pygame_game.Game()
-        if self.color != "":
-            self.game.set_color(self.color)
-        if self.sound != "":
-            self.game.set_sound(self.sound)
-        self.game.main_loop()
+    def close(self):
+        self.close = True  # GUI can now close tkinter window
 
 
-class Choice(tk.Frame):
+class ChoiceFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.settings = {'padx': 10, 'pady': 10}
@@ -141,7 +133,7 @@ class Choice(tk.Frame):
         self.sign_up_btn.grid(row=0, column=1, **self.settings)
 
 
-class Log_in(tk.Frame):
+class LogInFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.app = app
@@ -164,7 +156,7 @@ class Log_in(tk.Frame):
         self.back_btn.grid(row=3, column=0, **self.settings)
 
 
-class Sign_in(Log_in):
+class SignInFrame(LogInFrame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.check_btn = tk.Button(self, text="check details", command=self.app.check_details)
@@ -175,7 +167,7 @@ class Sign_in(Log_in):
         self.check_btn.grid(row=3, column=1, **self.settings)
 
 
-class Sign_up(Log_in):
+class SignUpFrame(LogInFrame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.name = tk.StringVar()
@@ -190,7 +182,7 @@ class Sign_up(Log_in):
         self.add_btn.grid(row=3, column=1, **self.settings)
 
 
-class Settings(tk.Frame):
+class SettingsFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.settings = {'padx': 10, 'pady': 10}
@@ -228,7 +220,7 @@ class Settings(tk.Frame):
         self.next_btn.grid(row=2, column=3, **self.settings)
 
 
-class Tutorial(tk.Frame):
+class TutorialFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.settings = {'padx': 10, 'pady': 10}
@@ -242,7 +234,7 @@ class Tutorial(tk.Frame):
                                              "answer reach the bottom, GAME OVER.  ")  # message text or label: message for non editable multiline text
 
         self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_settings)
-        self.play_btn = tk.Button(self, text="PLAY!", command=self.app.play, bg="green")
+        self.play_btn = tk.Button(self, text="PLAY!", command=self.app.close, bg="green")
 
     def place_widgets(self):
         self.tut_txt.grid(row=1, column=1, columnspan=2, **self.settings)
@@ -251,5 +243,6 @@ class Tutorial(tk.Frame):
 
 
 if __name__ == '__main__':
-    app = App()
-    app.mainloop()
+    controller = ControlGame()
+    tk_app = App(controller)
+    tk_app.mainloop()
