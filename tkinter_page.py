@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from controller import ControlGame
 from user import User
 from typing import Optional
@@ -13,61 +14,75 @@ class App(tk.Tk):
         self.username = ""
         self.name = ""
 
-
-        self.user: Optional[User] = None
-
         self.color = ""
         self.sound = ""
 
         self.settings = {'padx': 10, 'pady': 10}
-        self.title("Binary Game")
+        self.title("home page")
 
         # Set a fixed window size
-        self.geometry("400x300")  # Width x Height
+        self.geometry("500x300")  # Width x Height
         self.resizable(False, False)  # Prevent resizing
 
         # Frames
-        self.choice_frame = ChoiceFrame(self, width=400, height=300)
-        self.sign_in_frame = SignInFrame(self, width=400, height=300)
-        self.sign_up_frame = SignUpFrame(self, width=400, height=300)
-        self.settings_frame = SettingsFrame(self, width=400, height=300)
-        self.tutorial_frame = TutorialFrame(self, width=400, height=300)
+        self.choice_frame = ChoiceFrame(self, width=500, height=300)
+        self.sign_in_frame = SignInFrame(self, width=500, height=300)
+        self.sign_up_frame = SignUpFrame(self, width=500, height=300)
+        self.settings_frame = SettingsFrame(self, width=500, height=300)
+        self.question_frame = QuestionFrame(self, width=500, height=300)
+        self.tutorial_frame = TutorialFrame(self, width=500, height=300)
 
-        self.pack_frames()
+        self.go_to_choice()
 
-    def pack_frames(self):
-        self.choice_frame.grid()
-
-    def sign_in(self):
-        self.choice_frame.grid_forget()
-        self.sign_in_frame.grid()
-        self.sign_in_frame.place_widgets()
-
-    def sign_up(self):
-        self.choice_frame.grid_forget()
-        self.sign_up_frame.grid()
-        self.sign_up_frame.place_widgets()
-
-    def back_to_choice(self):
-        self.sign_in_frame.grid_forget()
-        self.sign_up_frame.grid_forget()
-        self.settings_frame.grid_forget()
-        self.choice_frame.grid()
-        self.choice_frame.place_widgets()
-
-    def back_to_settings(self):
+    def forget_frames(self):
         self.choice_frame.grid_forget()
         self.sign_in_frame.grid_forget()
         self.sign_up_frame.grid_forget()
         self.tutorial_frame.grid_forget()
+        self.question_frame.grid_forget()
+        self.settings_frame.grid_forget()
+
+    def go_to_sign_in(self):
+        self.forget_frames()
+        self.sign_in_frame.grid()
+        self.sign_in_frame.place_widgets()
+
+    def go_to_sign_up(self):
+        self.forget_frames()
+        self.sign_up_frame.grid()
+        self.sign_up_frame.place_widgets()
+
+    def go_to_choice(self):
+        self.forget_frames()
+        self.choice_frame.grid()
+        self.choice_frame.place_widgets()
+
+    def go_to_settings(self):
+        self.forget_frames()
         self.settings_frame.grid()
         self.settings_frame.place_widgets()
+
+    def go_to_question(self):
+        self.forget_frames()
+        self.question_frame.grid()
+        self.question_frame.place_widgets()
+
+    def go_to_tut(self):
+        if self.question_frame.question_drop.get()!=None:
+            type = self.question_frame.question_drop.get()
+        else:
+            type = None
+        self.controller.get_question_type(type)
+        self.forget_frames()
+        self.tutorial_frame.grid()
+        self.tutorial_frame.place_widgets()
 
     def check_details(self):
         username = self.sign_in_frame.username.get()
         password = self.sign_in_frame.password.get()
 
-        if self.controller.define_user(option="sign in", name=None, username=username, password=password):#if the user is found
+        if self.controller.define_user(option="sign in", name=None, username=username,
+                                       password=password):  # if the user is found
             self.sign_in_frame.try_again_txt.grid_forget()
             self.sign_in_frame.success_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
             self.sign_in_frame.next_btn.grid(row=3, column=2, **self.settings)
@@ -86,21 +101,6 @@ class App(tk.Tk):
         self.sign_up_frame.success_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
         self.sign_up_frame.next_btn.grid(row=3, column=2, **self.settings)
 
-    def go_to_settings(self):
-        self.sign_in_frame.grid_forget()
-        self.sign_up_frame.grid_forget()
-        self.choice_frame.grid_forget()
-        self.settings_frame.grid()
-        self.settings_frame.place_widgets()
-
-    def go_to_tut(self):
-        self.sign_in_frame.grid_forget()
-        self.sign_up_frame.grid_forget()
-        self.choice_frame.grid_forget()
-        self.settings_frame.grid_forget()
-        self.tutorial_frame.grid()
-        self.tutorial_frame.place_widgets()
-
     def change_color(self, color):
         print(f"Changing color to {color}")  # Placeholder for changing background in pygame
         self.color = color
@@ -108,6 +108,10 @@ class App(tk.Tk):
     def change_sound(self, sound):
         print(f"Changing sound to {sound}")  # Placeholder for changing sound in pygame
         self.sound = sound
+
+    def recommend(self):
+        self.controller.recommend = True
+        self.question_frame.question_drop.grid_forget()
 
     def close(self):
         self.quit()
@@ -119,8 +123,8 @@ class ChoiceFrame(tk.Frame):
         self.settings = {'padx': 10, 'pady': 10}
         self.app = app
 
-        self.sign_in_btn = tk.Button(self, text="Sign In", command=self.app.sign_in)
-        self.sign_up_btn = tk.Button(self, text="Sign Up", command=self.app.sign_up)
+        self.sign_in_btn = tk.Button(self, text="Sign In", command=self.app.go_to_sign_in)
+        self.sign_up_btn = tk.Button(self, text="Sign Up", command=self.app.go_to_sign_up)
 
         self.place_widgets()
 
@@ -140,7 +144,7 @@ class LogInFrame(tk.Frame):
         self.password_txt = tk.Label(self, text="Password")
         self.username_entry = tk.Entry(self, width=50, textvariable=self.username)
         self.password_entry = tk.Entry(self, width=50, show="*", textvariable=self.password)
-        self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_choice)
+        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_choice)
         self.next_btn = tk.Button(self, text="Next", command=self.app.go_to_settings)
         self.success_txt = tk.Label(self, text="successfully signed in/up", foreground="green")
 
@@ -198,22 +202,51 @@ class SettingsFrame(tk.Frame):
         self.click_btn = tk.Button(self, text="click noise", command=lambda: self.app.change_sound("click"))
         self.boing_btn = tk.Button(self, text="boing noise", command=lambda: self.app.change_sound("boing"))
 
-        self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_choice)
-        self.next_btn = tk.Button(self, text="next", command=self.app.go_to_tut)
+        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_choice)
+        self.next_btn = tk.Button(self, text="next", command=self.app.go_to_question)
 
     def place_widgets(self):
         self.red_btn.grid(row=0, column=0, **self.settings)
-        self.yellow_btn.grid(row=0, column=1, **self.app.settings)
-        self.green_btn.grid(row=0, column=2, **self.app.settings)
+        self.yellow_btn.grid(row=0, column=1, **self.settings)
+        self.green_btn.grid(row=0, column=2, **self.settings)
         self.blue_btn.grid(row=0, column=3, **self.settings)
-        self.purple_btn.grid(row=0, column=4, **self.app.settings)
+        self.purple_btn.grid(row=0, column=4, **self.settings)
 
-        self.cannon_btn.grid(row=1, column=1, **self.app.settings)
-        self.click_btn.grid(row=1, column=2, **self.app.settings)
-        self.boing_btn.grid(row=1, column=3, **self.app.settings)
+        self.cannon_btn.grid(row=1, column=1, **self.settings)
+        self.click_btn.grid(row=1, column=2, **self.settings)
+        self.boing_btn.grid(row=1, column=3, **self.settings)
 
         self.back_btn.grid(row=2, column=1, **self.settings)
         self.next_btn.grid(row=2, column=3, **self.settings)
+
+
+class QuestionFrame(tk.Frame):
+    def __init__(self, app, width, height):
+        super().__init__(app, width=width, height=height)
+        self.settings = {'padx': 10, 'pady': 10}
+        self.app = app
+        self.text = tk.Label(self, text="Would you like to choose your own question or have one recomended for you")
+        self.recommend_btn = tk.Button(self, text="recommend", command=lambda: self.app.recommend())
+
+        self.choose_btn = tk.Button(self, text="choose",
+                                    command=lambda: self.question_drop.grid(row=2, column=0,
+                                                                            **self.settings))
+        values = []
+        for key in self.app.controller.types.keys():
+            values.append(key)
+        self.question_drop = tk.ttk.Combobox(self, values=values, width=36)
+        self.question_drop["state"] = "readonly"
+
+        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_settings)
+        self.next_btn = tk.Button(self, text="next", command=self.app.go_to_tut)
+
+    def place_widgets(self):
+        self.text.grid(row=0, column=0, sticky="w",columnspan=2, **self.settings)
+        self.recommend_btn.grid(row=1, column=0, sticky="w", **self.settings)
+        self.choose_btn.grid(row=1, column=1, sticky="w", **self.app.settings)
+
+        self.back_btn.grid(row=3, column=0, sticky="w", **self.settings)
+        self.next_btn.grid(row=3, column=1, sticky="w", **self.settings)
 
 
 class TutorialFrame(tk.Frame):
@@ -229,7 +262,7 @@ class TutorialFrame(tk.Frame):
                                              "\nWATCHOUT:\nif you shoot down both incorrect answers or let the correct "
                                              "answer reach the bottom, GAME OVER.  ")  # message text or label: message for non editable multiline text
 
-        self.back_btn = tk.Button(self, text="Back", command=self.app.back_to_settings)
+        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_question)
         self.play_btn = tk.Button(self, text="PLAY!", command=self.app.close, bg="green")
 
     def place_widgets(self):

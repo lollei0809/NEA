@@ -15,14 +15,21 @@ class GUI:
         self.tkinter = App(self.controller)
         self.tkinter.mainloop()
 
-    def run_pyg(self):#only run when self.tkinter.close
+    def run_pyg(self):
         self.tkinter.close()
         self.pygame = Game()
         if self.tkinter.color != "":
             self.pygame.set_color(self.tkinter.color)
         if self.tkinter.sound != "":
             self.pygame.set_sound(self.tkinter.sound)
+        self.run_question()
         self.pygame.main_loop()
+
+    def run_question(self):
+        self.controller.gen_question()
+        self.pygame.set_question(self.controller.question.question_phrase)
+        self.pygame.set_answers(self.controller.question.plausible_answers,self.controller.question.correct_answer)
+
 
 if __name__ == '__main__':
     game_controller = ControlGame()

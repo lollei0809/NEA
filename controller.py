@@ -11,6 +11,7 @@ class ControlGame:
         self.correct = 0
         self.incorrect = 0
         self.type_acr = ""
+        self.recommend = False
         self.type = ""
         self.types = {"unsigned binary to decimal": "ubtd",
                       "decimal to unsigned binary": "dtub",
@@ -19,8 +20,8 @@ class ControlGame:
                       "hexadecimal to decimal": "htd",
                       "decimal to hexadecimal": "dth"}
 
-    def get_question_type(self, recommend, type):
-        if recommend == "yes":
+    def get_question_type(self, type):
+        if self.recommend:
             type = self.recommend_question()
         if type in self.types.keys():
             self.type = type

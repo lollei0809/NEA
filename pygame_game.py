@@ -71,7 +71,8 @@ class Spaceship(GameObject):
 
 class Answer(GameObject):
     def __init__(self, position):
-        super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 1 )))
+        super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 1)))
+        self.text = None
         self.correct = False
 
 
@@ -252,7 +253,7 @@ class Game:
                     print("GAME OVER, correct reached bottom")
             else:
                 self.game_over = True
-        #check bullet and top of screen
+        # check bullet and top of screen
         for bullet in self.bullets:
             if bullet.position.y <= -5:
                 self.bullets.remove(bullet)
@@ -265,6 +266,12 @@ class Game:
 
     def calc_percent(self):
         self.percentage = round(self.correct / (self.correct + self.incorrect), 1)
+
+    def set_question(self, question):
+        pass
+
+    def set_answers(self, plausible_answers,correct_answer):
+        pass
 
 
 if __name__ == "__main__":

@@ -84,3 +84,6 @@ and then use that same method to delete the bullet and answers when they collide
 -   sorted out sign in by putting username and password from tk through the controller then user
 -   lilly says shoot the wrong ones so the right one can reach the ground
 -   run tk then pygame in GUI by adding self.quit() to pygame.
+23/1/25
+-   added question frame to tk that conncects to get question type and recommend question in the controller
+--> need to write the set question and answer methods in pygame to make text boxes of the info in the controller
