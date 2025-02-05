@@ -8,11 +8,13 @@ class ControlGame:
     def __init__(self):
         self.user: Optional[User] = None
         self.question: Optional[Question] = None  # self.question can be none or a question object or its subclasses
+        self.graph_user1 = None
+        self.graph_user2 = None
         self.correct = 0
         self.incorrect = 0
-        self.type_acr = ""
+        self.type_acr = "ubtd"
         self.recommend = False
-        self.type = ""
+        self.type = "unsigned binary to decimal"
         self.types = {"unsigned binary to decimal": "ubtd",
                       "decimal to unsigned binary": "dtub",
                       "sign and magnitude binary to decimal": "smtd",

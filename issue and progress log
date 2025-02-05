@@ -85,5 +85,16 @@ and then use that same method to delete the bullet and answers when they collide
 -   lilly says shoot the wrong ones so the right one can reach the ground
 -   run tk then pygame in GUI by adding self.quit() to pygame.
 23/1/25
--   added question frame to tk that conncects to get question type and recommend question in the controller
+-   added question frame to tk that connects to get question type and recommend question in the controller
 --> need to write the set question and answer methods in pygame to make text boxes of the info in the controller
+24/1/2025
+-   put text onto the answer asteroids
+--> need to put the actual question and answers instead of generic text
+--> maybe i can include a stack/queue/hash table etc or recursion/optimisation
+28/1/2025
+-   I think there are issues with passing the same controller into the tk and then pygame in the gui as it is
+    outputting the error AttributeError: 'NoneType' object has no attribute 'plausible_answers' as the controller
+    question hasn't been defined
+-   incorrect type acronym
+30/1/2025
+-   i think change lots of the tk buttons into select an option

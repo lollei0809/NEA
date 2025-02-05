@@ -8,17 +8,20 @@ from typing import Optional
 class App(tk.Tk):
     def __init__(self, controller):
         super().__init__()
+
         self.controller = controller
 
         self.password = ""
         self.username = ""
         self.name = ""
 
+        self.num_users = 0
+
         self.color = ""
         self.sound = ""
 
         self.settings = {'padx': 10, 'pady': 10}
-        self.title("home page")
+        self.title("settings page")
 
         # Set a fixed window size
         self.geometry("500x300")  # Width x Height
@@ -31,6 +34,7 @@ class App(tk.Tk):
         self.settings_frame = SettingsFrame(self, width=500, height=300)
         self.question_frame = QuestionFrame(self, width=500, height=300)
         self.tutorial_frame = TutorialFrame(self, width=500, height=300)
+        self.graphs_frame = GraphsFrame(self, width=500, height=300)
 
         self.go_to_choice()
 
@@ -68,15 +72,28 @@ class App(tk.Tk):
         self.question_frame.place_widgets()
 
     def go_to_tut(self):
-        if self.question_frame.question_drop.get()!=None:
-            type = self.question_frame.question_drop.get()
-        else:
-            type = None
+        type = self.question_frame.question_drop.get()
         self.controller.get_question_type(type)
+        print(f"controller q type and acr: {self.controller.type} {self.controller.type_acr}")
         self.forget_frames()
         self.tutorial_frame.grid()
         self.tutorial_frame.place_widgets()
 
+    def go_to_graphs(self):
+        self.forget_frames()
+        self.graphs_frame.grid()
+        self.graphs_frame.place_widgets()
+
+    def show_graph(self):
+        if self.num_users == 1:
+            self.controller.graph_user1 = self.graphs_frame.username1.get()
+            print(self.controller.graph_user1)
+        elif self.num_users == 2:
+            self.controller.graph_user1 = self.graphs_frame.username1.get()
+            self.controller.graph_user2 = self.graphs_frame.username2.get()
+            print(self.controller.graph_user1,self.controller.graph_user2)
+        else:
+            print("user num incorrect")
     def check_details(self):
         username = self.sign_in_frame.username.get()
         password = self.sign_in_frame.password.get()
@@ -125,12 +142,14 @@ class ChoiceFrame(tk.Frame):
 
         self.sign_in_btn = tk.Button(self, text="Sign In", command=self.app.go_to_sign_in)
         self.sign_up_btn = tk.Button(self, text="Sign Up", command=self.app.go_to_sign_up)
+        self.graph_btn = tk.Button(self, text="Graphs", command=self.app.go_to_graphs)
 
         self.place_widgets()
 
     def place_widgets(self):
-        self.sign_in_btn.grid(row=0, column=0, **self.settings)
-        self.sign_up_btn.grid(row=0, column=1, **self.settings)
+        self.sign_in_btn.grid(row=0, column=0, sticky="w", **self.settings)
+        self.sign_up_btn.grid(row=0, column=1, sticky="w", **self.settings)
+        self.graph_btn.grid(row=0, column=2, sticky="w", **self.settings)
 
 
 class LogInFrame(tk.Frame):
@@ -216,8 +235,8 @@ class SettingsFrame(tk.Frame):
         self.click_btn.grid(row=1, column=2, **self.settings)
         self.boing_btn.grid(row=1, column=3, **self.settings)
 
-        self.back_btn.grid(row=2, column=1, **self.settings)
-        self.next_btn.grid(row=2, column=3, **self.settings)
+        self.back_btn.grid(row=2, column=0, **self.settings)
+        self.next_btn.grid(row=2, column=4, **self.settings)
 
 
 class QuestionFrame(tk.Frame):
@@ -241,7 +260,7 @@ class QuestionFrame(tk.Frame):
         self.next_btn = tk.Button(self, text="next", command=self.app.go_to_tut)
 
     def place_widgets(self):
-        self.text.grid(row=0, column=0, sticky="w",columnspan=2, **self.settings)
+        self.text.grid(row=0, column=0, sticky="w", columnspan=2, **self.settings)
         self.recommend_btn.grid(row=1, column=0, sticky="w", **self.settings)
         self.choose_btn.grid(row=1, column=1, sticky="w", **self.app.settings)
 
@@ -269,6 +288,50 @@ class TutorialFrame(tk.Frame):
         self.tut_txt.grid(row=1, column=1, columnspan=2, **self.settings)
         self.back_btn.grid(row=2, column=1, **self.settings)
         self.play_btn.grid(row=2, column=3, **self.settings)
+
+
+class GraphsFrame(tk.Frame):
+    def __init__(self, app, width, height):
+        super().__init__(app, width=width, height=height)
+        self.settings = {'padx': 10, 'pady': 10}
+        self.app = app
+        self.users_text = tk.Label(self, text="compare multiple users' high scores, or 1 user's high scores over time?")
+        self.type_text = tk.Label(self, text="select a specific question type or leave blank to compare all")
+        self.username1 = tk.StringVar()
+        self.username2 = tk.StringVar()
+        self.username1_entry = tk.Entry(self, width=50, textvariable=self.username1)
+        self.username2_entry = tk.Entry(self, width=50, textvariable=self.username2)
+
+        self.one_user_btn = tk.Button(self, text="1 user", command=lambda: self.grid1())
+        self.two_users_btn = tk.Button(self, text="multiple users", command=lambda: self.grid2())
+
+        values = []
+        for key in self.app.controller.types.keys():
+            values.append(key)
+        self.question_drop = tk.ttk.Combobox(self, values=values, width=36)
+        self.question_drop["state"] = "readonly"
+
+        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_settings)
+        self.go_btn = tk.Button(self, text="GO!", command=self.app.show_graph, bg="green")
+
+    def place_widgets(self):
+        self.users_text.grid(row=0, column=0, sticky="w", columnspan=2, **self.settings)
+        self.one_user_btn.grid(row=1, column=0, sticky="w", **self.settings)
+        self.two_users_btn.grid(row=1, column=1, sticky="w", **self.settings)
+        self.type_text.grid(row=4, column=0, sticky="w", columnspan=2, **self.settings)
+        self.question_drop.grid(row=5, column=0, **self.settings)
+        self.back_btn.grid(row=6, column=0, sticky="w", **self.settings)
+        self.go_btn.grid(row=6, column=1, sticky="w", **self.settings)
+
+    def grid1(self):
+        self.app.num_users = 1
+        self.username2_entry.grid_forget()
+        self.username1_entry.grid(row=2, column=0, sticky="w", columnspan=2, **self.settings)
+
+    def grid2(self):
+        self.app.num_users = 2
+        self.username1_entry.grid(row=2, column=0, sticky="w", columnspan=2, **self.settings)
+        self.username2_entry.grid(row=3, column=0, sticky="w", columnspan=2, **self.settings)
 
 
 if __name__ == '__main__':

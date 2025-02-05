@@ -11,6 +11,7 @@ from pygame import (
     K_SPACE,
 )
 from pygame.mixer import Sound
+from controller import ControlGame
 
 WIDTH = 1000
 HEIGHT = 600
@@ -70,10 +71,17 @@ class Spaceship(GameObject):
 
 
 class Answer(GameObject):
-    def __init__(self, position):
+    def __init__(self, position, text, correct):
         super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 1)))
-        self.text = None
-        self.correct = False
+        self.text = text
+        self.correct = correct
+
+    def draw(self, surface):
+        font = pygame.font.SysFont("Arial", 25)
+        textSurf = font.render(str(self.text), False, (0, 0, 0))
+        blit_position = self.position - pygame.math.Vector2(self.radius)
+        surface.blit(self.sprite, blit_position)
+        surface.blit(textSurf, (self.position.x - 30, self.position.y))
 
 
 class Bullet(GameObject):
@@ -100,7 +108,8 @@ class TextBox:
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, controller):
+        self.controller = controller
         self.correct = 0
         self.incorrect = 0
         self.percentage = 0
@@ -109,12 +118,14 @@ class Game:
         self.clock = pygame.time.Clock()
         self.background = load_image("red", (WIDTH, HEIGHT))  # default red
         self.spaceship = Spaceship((WIDTH / 2, 550))
-        self.answers = [[Answer((WIDTH / 4, 0)), Answer((WIDTH / 2, 0)), Answer((3 * WIDTH / 4, 0))]]
+        self.answer_dict = {}
+        self.answers = []
+        self.answers.append(self.make_answers())
         self.bullets = []
-
         self.correct_box = TextBox("correct: 0", (0, HEIGHT - 20))
         self.incorrect_box = TextBox("incorrect: 1", (220, HEIGHT - 20))
-        self.instruction_box = TextBox("question here", (0, 0))
+
+        self.question_box = TextBox("question here", (0, 0))
 
         self.paused = False
         self.pause_button = TextBox("Pause", (WIDTH - 50, 0))
@@ -125,7 +136,6 @@ class Game:
         self.play_sound = True
 
     def main_loop(self):
-
         while True:
             self.handle_input()
             self.process_game_logic()
@@ -176,6 +186,7 @@ class Game:
 
             self.correct_box.update_text(f"correct: {self.correct}")
             self.incorrect_box.update_text(f"incorrect: {self.incorrect}")
+            self.question_box.update_text(self.controller.question.question_phrase)
         else:
             self.pause_button.text = "Play"
 
@@ -186,13 +197,7 @@ class Game:
                     answer.velocity += (0, 0.1)
 
         for trio in self.answers:
-            if len(trio) != 0:
-                if trio[0].position.y == HEIGHT - 20:
-                    self.answers.append([Answer((random.randint(0, 333), 0)),
-                                         Answer((random.randint(333, 666), 0)),
-                                         Answer((random.randint(666, 1000), 0))
-                                         ])
-            else:
+            if len(trio) == 1 and trio[0].correct:
                 self.game_over = True
 
     def draw_game_elements(self):
@@ -205,9 +210,12 @@ class Game:
             self.calc_percent()
             percentage_text = TextBox(f"percentage correct: {self.percentage}%", (200, 300), 24, (0, 255, 0))
             self.correct_box.position, self.correct_box.font_size, self.correct_box.color = (200, 350), 24, (0, 255, 0)
+            self.incorrect_box.position, self.incorrect_box.font_size, self.incorrect_box.color = (200, 375), 24, (255, 0, 0)
+
             gameover_text.draw(self.screen)
             percentage_text.draw(self.screen)
             self.correct_box.draw(self.screen)
+            self.incorrect_box.draw(self.screen)
         else:
             self.screen.blit(self.background, (0, 0))
             self.spaceship.draw(self.screen)
@@ -219,8 +227,8 @@ class Game:
 
             self.correct_box.draw(self.screen)
             self.incorrect_box.draw(self.screen)
-            self.instruction_box.draw(self.screen)
             self.pause_button.draw(self.screen)
+            self.question_box.draw(self.screen)
 
             self.clock.tick(100)
         pygame.display.flip()
@@ -232,15 +240,17 @@ class Game:
                 for answer in trio:
                     if bullet.collides_with(answer):
                         self.bullets.remove(bullet)
-                        trio.remove(answer)
                         if answer.correct:
+                            self.answers.remove(trio)
                             self.correct += 1
                             self.correct_box.text_color = (0, 255, 0)
+                            self.answers.append(self.make_answers())
                         else:
+                            trio.remove(answer)
                             self.incorrect += 1
                             self.correct_box.text_color = (255, 0, 0)
                         break
-        # check correct answer and bottom
+        #check correct answer and bottom
         for trio in self.answers[:]:
             if len(trio) != 0:
                 if trio[0].position.y >= HEIGHT + 50:
@@ -249,11 +259,9 @@ class Game:
                             self.game_over = True
 
                     self.answers.remove(trio)
-
-                    print("GAME OVER, correct reached bottom")
             else:
                 self.game_over = True
-        # check bullet and top of screen
+        #check bullet and top of screen
         for bullet in self.bullets:
             if bullet.position.y <= -5:
                 self.bullets.remove(bullet)
@@ -265,15 +273,24 @@ class Game:
         self.spaceship.shoot_sound = load_sound(sound)
 
     def calc_percent(self):
-        self.percentage = round(self.correct / (self.correct + self.incorrect), 1)
+        self.percentage = round(self.correct / (self.correct + self.incorrect)*100, 1)
 
-    def set_question(self, question):
-        pass
-
-    def set_answers(self, plausible_answers,correct_answer):
-        pass
+    def make_answers(self):
+        self.controller.gen_question()
+        self.answer_dict = {}
+        answers = self.controller.question.plausible_answers
+        for answer in answers:
+            if answer == self.controller.question.correct_answer:
+                self.answer_dict[answer] = True
+            else:
+                self.answer_dict[answer] = False
+        return [Answer((WIDTH / 4, 0), answers[0], self.answer_dict[answers[0]]),
+                 Answer((WIDTH / 2, 0), answers[1], self.answer_dict[answers[1]]),
+                 Answer((3 * WIDTH / 4, 0), answers[2], self.answer_dict[answers[2]])
+                 ]
 
 
 if __name__ == "__main__":
-    game = Game()
+    game_controller = ControlGame()
+    game = Game(game_controller)
     game.main_loop()
