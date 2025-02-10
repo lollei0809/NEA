@@ -3,11 +3,17 @@ from tkinter import ttk
 from controller import ControlGame
 from user import User
 from typing import Optional
+import time
+from graph_making import GraphFrame
 
-
+WIDTH = 700
+HEIGHT = 400
+PADX = 10
+PADY = 10
 class App(tk.Tk):
     def __init__(self, controller):
         super().__init__()
+        self.tk.call("tk", "scaling", 2.0)
 
         self.controller = controller
 
@@ -20,21 +26,22 @@ class App(tk.Tk):
         self.color = ""
         self.sound = ""
 
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADY}
         self.title("settings page")
 
         # Set a fixed window size
-        self.geometry("500x300")  # Width x Height
-        self.resizable(False, False)  # Prevent resizing
+        self.geometry(f"{WIDTH}x{HEIGHT}")  # Width x Height
+        self.resizable(True, True)
 
         # Frames
-        self.choice_frame = ChoiceFrame(self, width=500, height=300)
-        self.sign_in_frame = SignInFrame(self, width=500, height=300)
-        self.sign_up_frame = SignUpFrame(self, width=500, height=300)
-        self.settings_frame = SettingsFrame(self, width=500, height=300)
-        self.question_frame = QuestionFrame(self, width=500, height=300)
-        self.tutorial_frame = TutorialFrame(self, width=500, height=300)
-        self.graphs_frame = GraphsFrame(self, width=500, height=300)
+        self.choice_frame = ChoiceFrame(self, width=WIDTH, height=HEIGHT)
+        self.sign_in_frame = SignInFrame(self, width=WIDTH, height=HEIGHT)
+        self.sign_up_frame = SignUpFrame(self, width=WIDTH, height=HEIGHT)
+        self.settings_frame = SettingsFrame(self, width=WIDTH, height=HEIGHT)
+        self.question_frame = QuestionFrame(self, width=WIDTH, height=HEIGHT)
+        self.tutorial_frame = TutorialFrame(self, width=WIDTH, height=HEIGHT)
+        self.graph_settings_frame = GraphSettingsFrame(self, width=WIDTH, height=HEIGHT)
+        self.graph_frame = GraphFrame(self, width=WIDTH, height=HEIGHT)
 
         self.go_to_choice()
 
@@ -45,6 +52,8 @@ class App(tk.Tk):
         self.tutorial_frame.grid_forget()
         self.question_frame.grid_forget()
         self.settings_frame.grid_forget()
+        self.graph_frame.grid_forget()
+        self.graph_settings_frame.grid_forget()
 
     def go_to_sign_in(self):
         self.forget_frames()
@@ -81,19 +90,21 @@ class App(tk.Tk):
 
     def go_to_graphs(self):
         self.forget_frames()
-        self.graphs_frame.grid()
-        self.graphs_frame.place_widgets()
+        self.graph_settings_frame.grid()
+        self.graph_settings_frame.place_widgets()
 
     def show_graph(self):
-        if self.num_users == 1:
-            self.controller.graph_user1 = self.graphs_frame.username1.get()
-            print(self.controller.graph_user1)
-        elif self.num_users == 2:
-            self.controller.graph_user1 = self.graphs_frame.username1.get()
-            self.controller.graph_user2 = self.graphs_frame.username2.get()
-            print(self.controller.graph_user1,self.controller.graph_user2)
-        else:
-            print("user num incorrect")
+        self.forget_frames()
+        self.graph_frame.grid()
+        ################
+        self.graph_frame.grid(row=0, column=0, sticky="nsew")
+        self.graph_frame.username1 = self.graph_settings_frame.username1.get()
+        self.graph_frame.username2 = self.graph_settings_frame.username2.get()
+        self.graph_frame.category = self.graph_settings_frame.type_drop.get()
+        self.graph_frame.get_details()
+        self.graph_frame.convert_to_pd()
+        self.graph_frame.draw_graph()
+        #######################
     def check_details(self):
         username = self.sign_in_frame.username.get()
         password = self.sign_in_frame.password.get()
@@ -137,7 +148,7 @@ class App(tk.Tk):
 class ChoiceFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADX}
         self.app = app
 
         self.sign_in_btn = tk.Button(self, text="Sign In", command=self.app.go_to_sign_in)
@@ -156,7 +167,7 @@ class LogInFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
         self.app = app
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADY}
         self.username = tk.StringVar()
         self.password = tk.StringVar()
         self.username_txt = tk.Label(self, text="username")
@@ -204,7 +215,7 @@ class SignUpFrame(LogInFrame):
 class SettingsFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADY}
         self.app = app
 
         self.red_btn = tk.Button(self, text="Red", command=lambda: self.app.change_color("red"), bg="red", fg="white")
@@ -242,7 +253,7 @@ class SettingsFrame(tk.Frame):
 class QuestionFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADY}
         self.app = app
         self.text = tk.Label(self, text="Would you like to choose your own question or have one recomended for you")
         self.recommend_btn = tk.Button(self, text="recommend", command=lambda: self.app.recommend())
@@ -271,12 +282,12 @@ class QuestionFrame(tk.Frame):
 class TutorialFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADY}
         self.app = app
 
         self.tut_txt = tk.Message(self, text="binary game tutorial!\nAIMS:\nshoot down the correct answer before it "
-                                             "reaches the bottom of the screen to increase the 'correct' score. "
-                                             "you have 2 chances to find the correct answer\nMOVEMENT:\nuse the arrow "
+                                             "reaches the bottom of the screen to increase the 'correct' score."
+                                             "MOVEMENT:\nuse the arrow "
                                              "keys to move the spaceship around and the space bar to shoot"
                                              "\nWATCHOUT:\nif you shoot down both incorrect answers or let the correct "
                                              "answer reach the bottom, GAME OVER.  ")  # message text or label: message for non editable multiline text
@@ -290,10 +301,10 @@ class TutorialFrame(tk.Frame):
         self.play_btn.grid(row=2, column=3, **self.settings)
 
 
-class GraphsFrame(tk.Frame):
+class GraphSettingsFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
-        self.settings = {'padx': 10, 'pady': 10}
+        self.settings = {'padx': PADX, 'pady': PADY}
         self.app = app
         self.users_text = tk.Label(self, text="compare multiple users' high scores, or 1 user's high scores over time?")
         self.type_text = tk.Label(self, text="select a specific question type or leave blank to compare all")
@@ -308,10 +319,10 @@ class GraphsFrame(tk.Frame):
         values = []
         for key in self.app.controller.types.keys():
             values.append(key)
-        self.question_drop = tk.ttk.Combobox(self, values=values, width=36)
-        self.question_drop["state"] = "readonly"
+        self.type_drop = tk.ttk.Combobox(self, values=values, width=36)
+        self.type_drop["state"] = "readonly"
 
-        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_settings)
+        self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_choice)
         self.go_btn = tk.Button(self, text="GO!", command=self.app.show_graph, bg="green")
 
     def place_widgets(self):
@@ -319,7 +330,7 @@ class GraphsFrame(tk.Frame):
         self.one_user_btn.grid(row=1, column=0, sticky="w", **self.settings)
         self.two_users_btn.grid(row=1, column=1, sticky="w", **self.settings)
         self.type_text.grid(row=4, column=0, sticky="w", columnspan=2, **self.settings)
-        self.question_drop.grid(row=5, column=0, **self.settings)
+        self.type_drop.grid(row=5, column=0, **self.settings)
         self.back_btn.grid(row=6, column=0, sticky="w", **self.settings)
         self.go_btn.grid(row=6, column=1, sticky="w", **self.settings)
 

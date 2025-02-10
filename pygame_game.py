@@ -72,9 +72,18 @@ class Spaceship(GameObject):
 
 class Answer(GameObject):
     def __init__(self, position, text, correct):
-        super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 1)))
+        super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 0.5)))
         self.text = text
         self.correct = correct
+
+    def move(self):
+        self.position += pygame.math.Vector2(0, 0.2)
+        if self.position.x > WIDTH:
+            self.position += pygame.math.Vector2(-3, 0.2)
+        elif self.position.x < 0:
+            self.position += pygame.math.Vector2(3, 0.2)
+        else:
+            self.position += pygame.math.Vector2(0, 0.2)
 
     def draw(self, surface):
         font = pygame.font.SysFont("Arial", 25)
@@ -110,8 +119,6 @@ class TextBox:
 class Game:
     def __init__(self, controller):
         self.controller = controller
-        self.correct = 0
-        self.incorrect = 0
         self.percentage = 0
         self.initialise_pygame()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -137,9 +144,13 @@ class Game:
 
     def main_loop(self):
         while True:
-            self.handle_input()
-            self.process_game_logic()
-            self.draw_game_elements()
+            if not self.game_over:
+                self.handle_input()
+                self.process_game_logic()
+                self.draw_game_elements()
+            else:
+                self.handle_input()
+                self.draw_game_elements()
 
     def initialise_pygame(self):
         pygame.init()
@@ -149,8 +160,10 @@ class Game:
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == pygame.KEYDOWN and event.key == K_ESCAPE):
                 # close with the x or esc
+                self.controller.update_recorded_scores()
+                self.controller.user.save_details_dict_to_json()
                 quit()
-            if event.type == KEYDOWN and event.key == K_SPACE:
+            if event.type == KEYDOWN and event.key == K_SPACE and self.spaceship != None:
                 self.spaceship.shoot_sound.play()
                 bullet_position = list(self.spaceship.position)
                 bullet_position[1] -= 40
@@ -163,15 +176,16 @@ class Game:
                     self.paused = not self.paused
 
         # update player on the basis of pressed keys
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[K_LEFT] and self.spaceship.position:
-            self.spaceship.velocity += (-1, 0)
-        if pressed_keys[K_RIGHT]:
-            self.spaceship.velocity += (1, 0)
-        if pressed_keys[K_UP]:
-            self.spaceship.velocity += (0, -1)
-        if pressed_keys[K_DOWN]:
-            self.spaceship.velocity += (0, 1)
+        if self.spaceship != None:
+            pressed_keys = pygame.key.get_pressed()
+            if pressed_keys[K_LEFT]:
+                self.spaceship.velocity += (-1, 0)
+            if pressed_keys[K_RIGHT]:
+                self.spaceship.velocity += (1, 0)
+            if pressed_keys[K_UP]:
+                self.spaceship.velocity += (0, -1)
+            if pressed_keys[K_DOWN]:
+                self.spaceship.velocity += (0, 1)
 
     def process_game_logic(self):
         if not self.paused:
@@ -184,13 +198,13 @@ class Game:
                     answer.move()
             self.check_collisions()
 
-            self.correct_box.update_text(f"correct: {self.correct}")
-            self.incorrect_box.update_text(f"incorrect: {self.incorrect}")
+            self.correct_box.update_text(f"correct: {self.controller.correct}")
+            self.incorrect_box.update_text(f"incorrect: {self.controller.incorrect}")
             self.question_box.update_text(self.controller.question.question_phrase)
         else:
             self.pause_button.text = "Play"
 
-        if self.correct >= (self.level + 10):
+        if self.controller.correct >= (self.level + 10):
             self.level += 10
             for trio in self.answers:
                 for answer in trio:
@@ -206,11 +220,15 @@ class Game:
                 self.play_sound = False
                 self.gameover_sound.play()
             self.screen.fill((0, 0, 0))
+            self.spaceship = None
+            self.answer_dict = None
+            self.bullets = None
             gameover_text = TextBox("GAME OVER", (200, 200), 100, (255, 0, 0))
             self.calc_percent()
             percentage_text = TextBox(f"percentage correct: {self.percentage}%", (200, 300), 24, (0, 255, 0))
             self.correct_box.position, self.correct_box.font_size, self.correct_box.color = (200, 350), 24, (0, 255, 0)
-            self.incorrect_box.position, self.incorrect_box.font_size, self.incorrect_box.color = (200, 375), 24, (255, 0, 0)
+            self.incorrect_box.position, self.incorrect_box.font_size, self.incorrect_box.color = (200, 375), 24, (
+                255, 0, 0)
 
             gameover_text.draw(self.screen)
             percentage_text.draw(self.screen)
@@ -242,26 +260,22 @@ class Game:
                         self.bullets.remove(bullet)
                         if answer.correct:
                             self.answers.remove(trio)
-                            self.correct += 1
+                            self.controller.correct += 1
                             self.correct_box.text_color = (0, 255, 0)
                             self.answers.append(self.make_answers())
                         else:
                             trio.remove(answer)
-                            self.incorrect += 1
+                            self.controller.incorrect += 1
                             self.correct_box.text_color = (255, 0, 0)
                         break
-        #check correct answer and bottom
+        # check correct answer and bottom
         for trio in self.answers[:]:
             if len(trio) != 0:
                 if trio[0].position.y >= HEIGHT + 50:
-                    for answer in trio:
-                        if answer.correct:
-                            self.game_over = True
+                    print("touch bottom")
+                    self.game_over = True
 
-                    self.answers.remove(trio)
-            else:
-                self.game_over = True
-        #check bullet and top of screen
+        # check bullet and top of screen
         for bullet in self.bullets:
             if bullet.position.y <= -5:
                 self.bullets.remove(bullet)
@@ -273,7 +287,10 @@ class Game:
         self.spaceship.shoot_sound = load_sound(sound)
 
     def calc_percent(self):
-        self.percentage = round(self.correct / (self.correct + self.incorrect)*100, 1)
+        if self.controller.incorrect != 0:
+            self.percentage = round(self.controller.correct / (self.controller.correct + self.controller.incorrect) * 100, 1)
+        else:
+            self.percentage = 0
 
     def make_answers(self):
         self.controller.gen_question()
@@ -285,9 +302,9 @@ class Game:
             else:
                 self.answer_dict[answer] = False
         return [Answer((WIDTH / 4, 0), answers[0], self.answer_dict[answers[0]]),
-                 Answer((WIDTH / 2, 0), answers[1], self.answer_dict[answers[1]]),
-                 Answer((3 * WIDTH / 4, 0), answers[2], self.answer_dict[answers[2]])
-                 ]
+                Answer((WIDTH / 2, 0), answers[1], self.answer_dict[answers[1]]),
+                Answer((3 * WIDTH / 4, 0), answers[2], self.answer_dict[answers[2]])
+                ]
 
 
 if __name__ == "__main__":

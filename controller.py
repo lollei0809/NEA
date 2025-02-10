@@ -8,8 +8,9 @@ class ControlGame:
     def __init__(self):
         self.user: Optional[User] = None
         self.question: Optional[Question] = None  # self.question can be none or a question object or its subclasses
-        self.graph_user1 = None
-        self.graph_user2 = None
+        self.graph_user1 = ""
+        self.graph_user2 = ""
+        self.graph_question_type = ""
         self.correct = 0
         self.incorrect = 0
         self.type_acr = "ubtd"
@@ -43,7 +44,7 @@ class ControlGame:
     def set_answer(self, answer):
         self.question.user_answer = answer
 
-    def update_scores(self, ):
+    def update_scores(self):#only in cli
         if self.question.check_answer():
             self.correct += 1
             return "correct"
