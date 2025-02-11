@@ -4,17 +4,19 @@ from controller import ControlGame
 from user import User
 from typing import Optional
 import time
+import seaborn as sns
 from graph_making import GraphFrame
 
 WIDTH = 700
 HEIGHT = 400
 PADX = 10
 PADY = 10
+SCALING = 2.0
 class App(tk.Tk):
     def __init__(self, controller):
         super().__init__()
-        self.tk.call("tk", "scaling", 2.0)
-
+        self.tk.call("tk", "scaling", SCALING)
+        sns.set(font_scale=0.5)
         self.controller = controller
 
         self.password = ""
@@ -96,15 +98,24 @@ class App(tk.Tk):
     def show_graph(self):
         self.forget_frames()
         self.graph_frame.grid()
-        ################
-        self.graph_frame.grid(row=0, column=0, sticky="nsew")
+
         self.graph_frame.username1 = self.graph_settings_frame.username1.get()
         self.graph_frame.username2 = self.graph_settings_frame.username2.get()
         self.graph_frame.category = self.graph_settings_frame.type_drop.get()
+
         self.graph_frame.get_details()
         self.graph_frame.convert_to_pd()
-        self.graph_frame.draw_graph()
-        #######################
+        if self.graph_frame.username2 == "" and self.graph_frame.category != "":
+            self.graph_frame.draw_1_user_1_category()
+        elif self.graph_frame.username2 == "" and self.graph_frame.category == "":
+            self.graph_frame.draw_1_user_all_categories()
+        elif self.graph_frame.username2 != "" and self.graph_frame.category != "":
+            self.graph_frame.draw_2_users_1_category()
+        elif self.graph_frame.username2 != "" and self.graph_frame.category == "":
+            self.graph_frame.draw_2_users_all_categories()
+        else:
+            print("error: not correct user or categories")
+
     def check_details(self):
         username = self.sign_in_frame.username.get()
         password = self.sign_in_frame.password.get()
@@ -314,7 +325,7 @@ class GraphSettingsFrame(tk.Frame):
         self.username2_entry = tk.Entry(self, width=50, textvariable=self.username2)
 
         self.one_user_btn = tk.Button(self, text="1 user", command=lambda: self.grid1())
-        self.two_users_btn = tk.Button(self, text="multiple users", command=lambda: self.grid2())
+        self.two_users_btn = tk.Button(self, text="2 users", command=lambda: self.grid2())
 
         values = []
         for key in self.app.controller.types.keys():
