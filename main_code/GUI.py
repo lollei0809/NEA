@@ -1,7 +1,6 @@
-from pygame_game import WIDTH, HEIGHT, load_image, load_sound, GameObject, Spaceship, Bullet, Answer, Game, TextBox
-from tkinter_page import App, ChoiceFrame, LogInFrame, SignInFrame, SignUpFrame, SettingsFrame
+from pygame_game import Game
+from tkinter_page import App
 from controller import ControlGame
-from questions import Question, UnsignedQuestion, SignAndMagnitude, HexToDec
 from typing import Optional
 
 

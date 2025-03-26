@@ -24,12 +24,12 @@ while run:
                     print("clicked inside rect 0")
                     color = (146, 36, 183)
                     bottom_lim += 50
-                    a = [1, 0]
+                    a = [0.5, 0]
             if rectangles[1].collidepoint(event.pos):
                     print("clicked inside rect 1")
                     color = (146, 36, 183)
                     bottom_lim += 50
-                    a = [1, 0]
+                    a = [0.5, 0]
 
     screen.fill((255, 255, 255))
     pygame.draw.rect(screen, color, rectangles[0])

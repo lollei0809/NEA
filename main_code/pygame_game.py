@@ -1,4 +1,3 @@
-import random
 import pygame
 from pygame import (
     K_LEFT,
@@ -12,20 +11,21 @@ from pygame import (
 )
 from pygame.mixer import Sound
 from controller import ControlGame
+from user import User
 
 WIDTH = 1000
 HEIGHT = 600
 
 
 def load_image(name, size):
-    destination = f"assets/sprites/{name}.png"
+    destination = f"../assets/sprites/{name}.png"
     image = pygame.image.load(destination)
     image = pygame.transform.scale(image, size)
     return image.convert_alpha()
 
 
 def load_sound(name):
-    path = f"assets/sounds/{name}.wav"
+    path = f"../assets/sounds/{name}.wav"
     return Sound(path)
 
 
@@ -75,15 +75,15 @@ class Answer(GameObject):
         super().__init__(position, load_image("asteroid", (100, 100)), pygame.math.Vector2((0, 0.5)))
         self.text = text
         self.correct = correct
+        self.speed=0.1
 
     def move(self):
-        self.position += pygame.math.Vector2(0, 0.2)
         if self.position.x > WIDTH:
-            self.position += pygame.math.Vector2(-3, 0.2)
+            self.position += pygame.math.Vector2(-3, self.speed)
         elif self.position.x < 0:
-            self.position += pygame.math.Vector2(3, 0.2)
+            self.position += pygame.math.Vector2(3, self.speed)
         else:
-            self.position += pygame.math.Vector2(0, 0.2)
+            self.position += pygame.math.Vector2(0, self.speed)
 
     def draw(self, surface):
         font = pygame.font.SysFont("Arial", 25)
@@ -123,7 +123,7 @@ class Game:
         self.initialise_pygame()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
-        self.background = load_image("red", (WIDTH, HEIGHT))  # default red
+        self.background = load_image("red", (WIDTH, HEIGHT))
         self.spaceship = Spaceship((WIDTH / 2, 550))
         self.answer_dict = {}
         self.answers = []
@@ -136,7 +136,6 @@ class Game:
 
         self.paused = False
         self.pause_button = TextBox("Pause", (WIDTH - 50, 0))
-        self.level = 0
         self.game_over = False
 
         self.gameover_sound = load_sound("game_over")
@@ -162,6 +161,7 @@ class Game:
                 # close with the x or esc
                 self.controller.update_recorded_scores()
                 self.controller.user.save_details_dict_to_json()
+                print(self.controller.user.find_high_score(self.controller.type))
                 quit()
             if event.type == KEYDOWN and event.key == K_SPACE and self.spaceship != None:
                 self.spaceship.shoot_sound.play()
@@ -195,6 +195,16 @@ class Game:
                 bullet.move()
             for trio in self.answers:
                 for answer in trio:
+                    if self.controller.correct<5:
+                        answer.speed=0.1
+                    elif self.controller.correct<10:
+                        answer.speed=0.2
+                    elif self.controller.correct<15:
+                        answer.speed=0.4
+                    elif self.controller.correct<20:
+                        answer.speed=0.8
+                    else:
+                        answer.speed=1
                     answer.move()
             self.check_collisions()
 
@@ -203,12 +213,6 @@ class Game:
             self.question_box.update_text(self.controller.question.question_phrase)
         else:
             self.pause_button.text = "Play"
-
-        if self.controller.correct >= (self.level + 10):
-            self.level += 10
-            for trio in self.answers:
-                for answer in trio:
-                    answer.velocity += (0, 0.1)
 
         for trio in self.answers:
             if len(trio) == 1 and trio[0].correct:
@@ -220,6 +224,9 @@ class Game:
                 self.play_sound = False
                 self.gameover_sound.play()
             self.screen.fill((0, 0, 0))
+            if self.controller.correct > self.controller.user.find_high_score(self.controller.type):
+                high_score_text = TextBox("NEW HIGH SCORE!", (100, 100), 75, (255, 215, 0))
+                high_score_text.draw(self.screen)
             self.spaceship = None
             self.answer_dict = None
             self.bullets = None
@@ -253,8 +260,8 @@ class Game:
 
     def check_collisions(self):
         # check bullet and answer
-        for bullet in self.bullets[:]:  # copy of the list to avoid errors
-            for trio in self.answers[:]:
+        for bullet in self.bullets:  # copy of the list to avoid errors
+            for trio in self.answers:
                 for answer in trio:
                     if bullet.collides_with(answer):
                         self.bullets.remove(bullet)
@@ -269,7 +276,7 @@ class Game:
                             self.correct_box.text_color = (255, 0, 0)
                         break
         # check correct answer and bottom
-        for trio in self.answers[:]:
+        for trio in self.answers:
             if len(trio) != 0:
                 if trio[0].position.y >= HEIGHT + 50:
                     print("touch bottom")
@@ -309,5 +316,8 @@ class Game:
 
 if __name__ == "__main__":
     game_controller = ControlGame()
+    game_controller.user= User()
+    game_controller.user.get_details()
+    game_controller.user.sign_in("jane123","asdf")
     game = Game(game_controller)
     game.main_loop()

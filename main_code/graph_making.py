@@ -11,9 +11,7 @@ WIDTH = 700
 HEIGHT = 400
 PADX = 10
 PADY = 10
-SCALING = 2.0
-
-
+SCALING = 2
 class GraphFrame(tk.Frame):
     def __init__(self, app, width, height):
         super().__init__(app, width=width, height=height)
@@ -27,12 +25,20 @@ class GraphFrame(tk.Frame):
         self.category = ""
         self.df = None
 
-        self.figure, self.ax = plt.subplots(figsize=(WIDTH / (100 * SCALING), HEIGHT / (100 * SCALING)))
+        self.figure, self.ax = plt.subplots(figsize=(WIDTH / (50 * SCALING), HEIGHT / (50 * SCALING)))
 
         self.canvas = FigureCanvasTkAgg(self.figure, master=self)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=False)
 
         self.back_btn = tk.Button(self, text="Back", command=self.app.go_to_graphs)
+        self.types = {"unsigned binary to decimal": "ubtd",
+                      "decimal to unsigned binary": "dtub",
+                      "sign and magnitude binary to decimal": "smtd",
+                      "decimal to sign and magnitude binary": "dtsm",
+                      "two's complement binary to decimal": "tctd",
+                      "decimal to two's complement binary": "dttc",
+                      "hexadecimal to decimal": "htd",
+                      "decimal to hexadecimal": "dth"}
 
     def get_details(self):
         with open("details.json", mode="r", encoding="utf-8") as read_file:
@@ -67,48 +73,39 @@ class GraphFrame(tk.Frame):
         filtered_df = self.df[(self.df["Category"] == self.category) & (self.df["Username"] == self.username1)]
         self.ax.clear()
         sns.barplot(data=filtered_df, x="Attempt", y="Score", hue="Type", ax=self.ax)
-        self.ax.set_title(f"Correct vs Incorrect for {self.user1_data.get('name', self.username1)} for {self.category}")
+        self.ax.set_title(f"scores for {self.user1_data.get('name', self.username1)} for {self.category}")
         self.ax.set_xlabel("Attempt")
         self.ax.set_ylabel("Score")
         # self.ax.tick_params(axis='x', rotation=45)
         self.ax.legend(title="Answer Type")
+        self.figure.tight_layout()
         self.canvas.draw()
         self.back_btn.pack()
 
     def draw_1_user_all_categories(self):
-        pass
-
-    def draw_2_users_1_category(self):
-        pass
-
-    def draw_2_users_all_categories(self):
-        filtered_df = self.df[((self.df["Username"] == self.username1) | (self.df["Username"] == self.username2)) & (
-                    self.df["Type"] == "Correct")]
-        #here i want to average the correct and incorrect on each attempt to get rid of those black lines
-
-        print(filtered_df)
+        filtered_df = self.df[(self.df["Username"] == self.username1)]
+        filtered_df["Category"] = filtered_df["Category"].map(self.types)#to show the acronyms not the words so it isnt overcrowded
         self.ax.clear()
-        sns.barplot(data=filtered_df, x="Category", y="Score", hue="Username", ax=self.ax)
+        sns.barplot(data=filtered_df, x="Category", y="Score", hue="Type", ax=self.ax)
         self.ax.set_title(
-            f"scores for {self.user1_data.get('name', self.username1)} and {self.user1_data.get('name', self.username2)}")
-        self.ax.set_xlabel("Attempt")
-        self.ax.set_ylabel("Score")
-        self.ax.tick_params(axis='x', rotation=45)
+            f"scores for {self.user1_data.get('name', self.username1)}  ")
+        self.ax.set_xlabel("Category")
+        self.ax.set_ylabel("Score")#
         self.ax.legend(title="Answer Type")
+        self.figure.tight_layout()
         self.canvas.draw()
         self.back_btn.pack()
 
 
-if __name__ == '__main__':
-    root = tk.Tk()
-    sns.set(font_scale=0.5)
-    sns.set_theme()
-    graph_frame = GraphFrame(root, width=WIDTH, height=HEIGHT)
-    graph_frame.grid()
-    graph_frame.username1 = "lolly123"
-    graph_frame.category = "unsigned binary to decimal"
-    graph_frame.get_details()
-    graph_frame.convert_to_pd()
-    graph_frame.draw_1_user_1_category()
-
-    root.mainloop()
+    def draw_2_users_1_category(self):
+        filtered_df = self.df[((self.df["Username"] == self.username1) | (self.df["Username"] == self.username2)) & (
+                self.df["Category"] == self.category)]
+        self.ax.clear()
+        sns.barplot(data=filtered_df, x="Username", y="Score", hue="Type", ax=self.ax)
+        self.ax.set_title(f"Correct vs Incorrect for {self.user1_data.get('name', self.username1)} and {self.user2_data.get('name', self.username2)} for {self.category}")
+        self.ax.set_xlabel("Username")
+        self.ax.set_ylabel("Score")
+        self.ax.legend(title="Answer Type")
+        self.figure.tight_layout()
+        self.canvas.draw()
+        self.back_btn.pack()

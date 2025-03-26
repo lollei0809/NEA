@@ -6,6 +6,7 @@ class Question(ABC):
     """abstract base class which other question classes inherit from
     most methods have property making them virtual/abstract methods that the subclasses will overwrite
     """
+
     def __init__(self, type_acr):
         """
         
@@ -66,7 +67,8 @@ class UnsignedQuestion(Question):
     allowed types is a class attribute that can be called even if no instance of the class has been made and it
     describes the type the answer should be. eg: dtub = decimal(integer)--> unsigned binary(string) and vice versa 
     """
-    allowed_types = {"dtub":"str", "ubtd":"int"}
+    allowed_types = {"dtub": "str", "ubtd": "int"}
+
     def __init__(self, type_acr):
         """
         calls parent constructor with the type acronym eg: dtub
@@ -148,19 +150,19 @@ class UnsignedQuestion(Question):
          of the items
 
         """
-        plausible_answers_set = {self.correct_answer}#prevent duplicates
+        plausible_answers_set = {self.correct_answer}  # prevent duplicates
 
-        if self.question_type == "dtub":#flips a random bit in the binary
+        if self.question_type == "dtub":  # flips a random bit in the binary
             while len(plausible_answers_set) < 3:
                 bit_index = random.randint(0, self.num_bits - 1)
                 temp = list(self.correct_answer)
                 temp[bit_index] = "1" if temp[bit_index] == "0" else "0"
                 plausible_answer = "".join(temp)
-                plausible_answers_set.add(plausible_answer)#will ignore if it is a duplicate
+                plausible_answers_set.add(plausible_answer)  # will ignore if it is a duplicate
         else:
             while len(plausible_answers_set) < 3:
-                plausible_answer = 256#out of range
-                while plausible_answer < 0 or plausible_answer > 255:
+                plausible_answer = 2**self.num_bits  # out of range
+                while plausible_answer < 0 or plausible_answer > (2**self.num_bits)-1:
                     offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
                     plausible_answer = int(self.correct_answer) + offset
                 plausible_answers_set.add(plausible_answer)
@@ -172,8 +174,9 @@ class UnsignedQuestion(Question):
 class SignAndMagnitude(Question):
     """ allows for conversion between a sign and magnitude and decimal numbers
     """
-    allowed_types = {"smtd":"int", "dtsm":"str"}
-    def __init__(self,type_acr):
+    allowed_types = {"smtd": "int", "dtsm": "str"}
+
+    def __init__(self, type_acr):
         super().__init__(type_acr)  # Call the parent constructor
         self.num_bits = 8
 
@@ -187,7 +190,7 @@ class SignAndMagnitude(Question):
         """
         bits = ""
         if self.question_type == "dtsm":
-            self.question = random.randint(int(-1 * (((2 ** self.num_bits) / 2) - 1)), (2 ** self.num_bits) / 2)
+            self.question = random.randint(int(-1 * (((2 ** self.num_bits) / 2) - 1)), (2 ** self.num_bits) / 2)-1
 
         else:
             for i in range(self.num_bits):
@@ -209,10 +212,6 @@ class SignAndMagnitude(Question):
 
     def generate_correct_answer(self):
         """ converts the question from sign and magnitude binary to decimal or vice versa
-        if the question is sign and magnitude, it sums the right 7 bits values and checks if the msb is 1 or 0. accounts
-         for -0
-        if the question is decimal, it assigns the msb according to the sign of the number (either 1 or 0 if decimal is
-        0) and then converts the absolute value of the question to binary and adds on the msb
         Attributes
         ----------
         self.correct_answer now holds the calculated string or integer
@@ -276,8 +275,8 @@ class SignAndMagnitude(Question):
                 plausible_answers_set.add(plausible_answer)
         else:
             while len(plausible_answers_set) < 3:
-                plausible_answer = 128 #out of range
-                while plausible_answer < -127 or plausible_answer > 127:
+                plausible_answer = 2**(self.num_bits-1)  # out of range
+                while plausible_answer < -1*(2**(self.num_bits-1)-1) or plausible_answer > (2**(self.num_bits-1)-1):
                     offset = random.randint(-1 * abs(int(self.correct_answer)) // 2, abs(int(self.correct_answer)) // 2)
                     plausible_answer = int(self.correct_answer) + offset
                 plausible_answers_set.add(plausible_answer)
@@ -285,13 +284,137 @@ class SignAndMagnitude(Question):
         self.plausible_answers = list(plausible_answers_set)
         random.shuffle(self.plausible_answers)
 
+
+class TwosComplement(Question):
+    """ allows for conversion between twos compliment binary and decimal numbers
+        """
+    allowed_types = {"tctd": "int", "dttc": "str"}
+
+    def __init__(self, type_acr):
+        super().__init__(type_acr)  # Call the parent constructor
+        self.num_bits = 8
+
+    def generate_question(self):
+        """
+        if the question is decimal, it generates a decimal number from -128 to 127
+        if the question is twos complement binary, it generates random 8 bit sequence
+        Attributes
+        ----------
+        self.question now holds the 8 bit unsigned binary or an integer
+        """
+        bits = ""
+        if self.question_type == "dttc":
+            self.question = random.randint(int(-1 * (((2 ** self.num_bits) / 2))), ((2 ** self.num_bits) / 2)-1)
+
+        else:
+            for i in range(self.num_bits):
+                bits = bits + str(random.choice([0, 1]))
+                self.question = bits
+
+    def generate_question_phrase(self):
+        """
+        creates a sentence holding the question number
+        Attributes
+        ----------
+        self.question_phrase holds a string with the sentence and question number
+
+        """
+        if self.question_type == "tctd":
+            self.question_phrase = f"convert this two's complement binary number {self.question} to decimal"
+        else:
+            self.question_phrase = f"convert this decimal number {self.question} to two's complement binary"
+
+    def generate_correct_answer(self):
+        """ converts the question from sign twos complement binary to decimal or vice versa
+        if the question is twos complement, it sums the right 7 bits values and checks if the msb is 1 or 0. accounts
+         for -0
+        if the question is decimal, it assigns the msb according to the sign of the number (either 1 or 0 if decimal is
+        0) and then converts the absolute value of the question to binary and adds on the msb
+        Attributes
+        ----------
+        self.correct_answer now holds the calculated string or integer
+        self.plausible_answers is a list with the correct answer inside
+
+        """
+        self.correct_answer = ""
+        if self.question_type == "tctd":
+            j = 1
+            total = 0
+            for i in range(self.num_bits - 1):
+                total += j * int(self.question[-(i + 1)])
+                j *= 2
+            msb = self.question[0]
+            if msb == "0":
+                self.correct_answer = total
+            else:
+                self.correct_answer = -(2**(self.num_bits - 1))+total
+
+        else:
+            if self.question>=0:
+                j = 2 ** (self.num_bits - 1)
+                total = ""
+                temp = int(self.question)
+                for i in range(self.num_bits):
+                    if temp >= j:
+                        total += "1"
+                        temp -= j
+                    else:
+                        total += "0"
+                    j /= 2
+            else:
+                total = "1"
+                temp = 128+int(self.question)
+                j = 2 ** (self.num_bits - 2)
+                for i in range(self.num_bits-1):
+                    if temp >= j:
+                        total += "1"
+                        temp -= j
+                    else:
+                        total += "0"
+                    j /= 2
+
+            self.correct_answer=total
+        self.plausible_answers.append(self.correct_answer)
+
+    def generate_plausible_answers(self):
+        """ creates 2 incorrect but similar answers and appends them to the plausible answers
+        plausible_answers_set is used to prevent duplicates
+        if the question is decimal, a random bit in the answer is flipped to create a similar but distinct plausible answer
+        if the question is a twos complement binary string, a small offset is added
+        Attributes
+        -------
+        self.plausible_answers is now a list with 1 correct and 2 incorrect answers and is shuffeled to change the order
+         of the items
+        """
+        plausible_answers_set = {self.correct_answer}
+
+        if self.question_type == "dttc":
+            while len(plausible_answers_set) < 3:
+                bit_index = random.randint(0, self.num_bits - 1)
+                temp = list(self.correct_answer)
+                temp[bit_index] = "1" if temp[bit_index] == "0" else "0"
+                plausible_answer = "".join(temp)
+                plausible_answers_set.add(plausible_answer)
+        else:
+            while len(plausible_answers_set) < 3:
+                plausible_answer = 2**(self.num_bits-1)  # out of range
+                while plausible_answer < -1*(2**(self.num_bits)) or plausible_answer > 2**self.num_bits-1:
+                    offset = random.randint(-1 * abs(int(self.correct_answer)) // 2, abs(int(self.correct_answer)) // 2)
+                    plausible_answer = int(self.correct_answer) + offset
+                plausible_answers_set.add(plausible_answer)
+
+        self.plausible_answers = list(plausible_answers_set)
+        random.shuffle(self.plausible_answers)
+
+
 class HexToDec(Question):
     """
     allows for hexidecimal numbers to be converted to decimal and vice versa
     """
-    allowed_types = {"htd":"int", "dth":"str"}
-    def __init__(self,type_acr):
-        super().__init__(type_acr)  # Call the parent constructor
+    allowed_types = {"htd": "int", "dth": "str"}
+
+    def __init__(self, type_acr):
+        super().__init__(type_acr)
         self.type = type_acr
         self.num_bits = 8
         self.num_hex_chars = self.num_bits / 4
@@ -357,10 +480,14 @@ class HexToDec(Question):
             decimal = int(self.question)
             if decimal == 0:
                 hexadecimal = "00"
-            while decimal > 0:
+            if decimal < 16:
                 remainder = decimal % 16
-                hexadecimal = str(self.key_list[remainder]) + hexadecimal
-                decimal //= 16
+                hexadecimal = "0" + str(self.key_list[remainder])
+            else:
+                while decimal > 0:
+                    remainder = decimal % 16
+                    hexadecimal = str(self.key_list[remainder]) + hexadecimal
+                    decimal //= 16
             self.correct_answer = hexadecimal
 
         self.plausible_answers.append(self.correct_answer)
@@ -375,7 +502,7 @@ class HexToDec(Question):
         self.plausible_answers is now a list with 1 correct and 2 incorrect answers and is shuffeled to change the order
          of the items
         """
-        plausible_answers_set = {self.correct_answer}#prevent duplicates
+        plausible_answers_set = {self.correct_answer}  # prevent duplicates
 
         if self.question_type == "dth":
             while len(plausible_answers_set) < 3:
@@ -388,7 +515,7 @@ class HexToDec(Question):
 
         else:
             while len(plausible_answers_set) < 3:
-                plausible_answer = 256#out of range of two digit hex
+                plausible_answer = 256  # out of range of two digit hex
                 while plausible_answer < 0 or plausible_answer > 255:
                     offset = random.randint(-1 * int(self.correct_answer) // 2, int(self.correct_answer) // 2)
                     plausible_answer = int(self.correct_answer) + offset

@@ -1,6 +1,5 @@
 pytest~=8.3.3
 pygame~=2.6.0
-bcrypt~=4.2.0
 PyInputPlus~=0.2.12
 matplotlib~=3.10.0rc1
 bcrypt~=4.2.1

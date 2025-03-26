@@ -1,9 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from controller import ControlGame
-from user import User
-from typing import Optional
-import time
 import seaborn as sns
 from graph_making import GraphFrame
 
@@ -16,7 +13,7 @@ class App(tk.Tk):
     def __init__(self, controller):
         super().__init__()
         self.tk.call("tk", "scaling", SCALING)
-        sns.set(font_scale=0.5)
+        sns.set(font_scale=1)
         self.controller = controller
 
         self.password = ""
@@ -85,7 +82,6 @@ class App(tk.Tk):
     def go_to_tut(self):
         type = self.question_frame.question_drop.get()
         self.controller.get_question_type(type)
-        print(f"controller q type and acr: {self.controller.type} {self.controller.type_acr}")
         self.forget_frames()
         self.tutorial_frame.grid()
         self.tutorial_frame.place_widgets()
@@ -111,8 +107,6 @@ class App(tk.Tk):
             self.graph_frame.draw_1_user_all_categories()
         elif self.graph_frame.username2 != "" and self.graph_frame.category != "":
             self.graph_frame.draw_2_users_1_category()
-        elif self.graph_frame.username2 != "" and self.graph_frame.category == "":
-            self.graph_frame.draw_2_users_all_categories()
         else:
             print("error: not correct user or categories")
 
@@ -135,7 +129,7 @@ class App(tk.Tk):
         password = self.sign_up_frame.password.get()
 
         self.controller.define_user(option="sign up", name=name, username=username, password=password)
-        print(self.controller.user.details_dict)
+
 
         self.sign_up_frame.success_txt.grid(row=4, column=0, columnspan=2, sticky="W", **self.settings, )
         self.sign_up_frame.next_btn.grid(row=3, column=2, **self.settings)
@@ -162,6 +156,7 @@ class ChoiceFrame(tk.Frame):
         self.settings = {'padx': PADX, 'pady': PADX}
         self.app = app
 
+        self.welcome_text = tk.Label(self,text="Welcome to BIT BLAST!",font=("Helvetica", 20), fg="red")
         self.sign_in_btn = tk.Button(self, text="Sign In", command=self.app.go_to_sign_in)
         self.sign_up_btn = tk.Button(self, text="Sign Up", command=self.app.go_to_sign_up)
         self.graph_btn = tk.Button(self, text="Graphs", command=self.app.go_to_graphs)
@@ -169,9 +164,10 @@ class ChoiceFrame(tk.Frame):
         self.place_widgets()
 
     def place_widgets(self):
-        self.sign_in_btn.grid(row=0, column=0, sticky="w", **self.settings)
-        self.sign_up_btn.grid(row=0, column=1, sticky="w", **self.settings)
-        self.graph_btn.grid(row=0, column=2, sticky="w", **self.settings)
+        self.welcome_text.grid(row=0, column=0, sticky="w", **self.settings)
+        self.sign_in_btn.grid(row=1, column=0, sticky="w", **self.settings)
+        self.sign_up_btn.grid(row=1, column=1, sticky="w", **self.settings)
+        self.graph_btn.grid(row=1, column=2, sticky="w", **self.settings)
 
 
 class LogInFrame(tk.Frame):

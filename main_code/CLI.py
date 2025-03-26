@@ -1,12 +1,14 @@
 from controller import ControlGame
 import pyinputplus as pyip
-
 if __name__ == "__main__":
     game = ControlGame()
     option = pyip.inputMenu(["sign in", "sign up"],
                             prompt="enter an option(1-2):\n",
                             numbered=True)
-    game.define_user(option)
+    name = input("Name:")
+    username = input("Username:")
+    password = input("password:")
+    game.define_user(option,username=username,password=password, name = name)
     recommend = pyip.inputYesNo("do you want to be recommended a question type")
     if recommend == "no":
         type = pyip.inputMenu(list(game.types.keys()),

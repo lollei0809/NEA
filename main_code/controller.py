@@ -1,6 +1,6 @@
 from typing import Optional
-from questions import Question, UnsignedQuestion, SignAndMagnitude, HexToDec
-from user import User
+from main_code.questions import Question, UnsignedQuestion, SignAndMagnitude, HexToDec, TwosComplement
+from main_code.user import User
 import random
 
 
@@ -20,6 +20,8 @@ class ControlGame:
                       "decimal to unsigned binary": "dtub",
                       "sign and magnitude binary to decimal": "smtd",
                       "decimal to sign and magnitude binary": "dtsm",
+                      "two's complement binary to decimal": "tctd",
+                      "decimal to two's complement binary": "dttc",
                       "hexadecimal to decimal": "htd",
                       "decimal to hexadecimal": "dth"}
 
@@ -35,6 +37,8 @@ class ControlGame:
             self.question = UnsignedQuestion(self.type_acr)
         elif self.type_acr in SignAndMagnitude.allowed_types.keys():
             self.question = SignAndMagnitude(self.type_acr)
+        elif self.type_acr in TwosComplement.allowed_types.keys():
+            self.question = TwosComplement(self.type_acr)
         elif self.type_acr in HexToDec.allowed_types.keys():
             self.question = HexToDec(self.type_acr)
         else:
@@ -44,17 +48,13 @@ class ControlGame:
     def set_answer(self, answer):
         self.question.user_answer = answer
 
-    def update_scores(self):#only in cli
+    def update_scores(self):  # only in cli
         if self.question.check_answer():
             self.correct += 1
             return "correct"
-
-            # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
         else:
             self.incorrect += 1
             return "incorrect"
-
-            # self.user.details_dict[self.user.username][self.type]["correct"][-1] += 1
 
     def define_user(self, option, name: None, username, password):
         self.user = User()
@@ -72,22 +72,32 @@ class ControlGame:
         correct_sum = 0
         incorrect_sum = 0
         for item in self.user.details_dict[self.user.username][type]["correct"]:
-            correct_sum += item
+            correct_sum += int(item)
         for item in self.user.details_dict[self.user.username][type]["incorrect"]:
-            incorrect_sum += item
+            incorrect_sum += int(item)
         try:
             percent = correct_sum / (correct_sum + incorrect_sum)
         except ZeroDivisionError:
-            percent = 0
+            percent = 0.5
         return round(percent, 2)
 
     def recommend_question(self):
-        decimals = []
-        for item in self.types.keys():
-            decimals.append(self.calc_average_correct(item))
-        # make weightings if no questions answered start 50%
-        for i in range(len(decimals)):
-            decimals[i] = 1 - decimals[i]  # reverses so mostly correct is low decimal so less likely to be chosen
-        choice = random.choices(list(self.types.keys()), weights=decimals)
-        # choice is returned as list with 1 item
-        return choice[0]
+        """Recommend a question type based on the user's scores."""
+        self.user.get_queue()
+        if self.user.queue.is_empty():
+            for question_type in self.types:
+                correct = self.calc_average_correct(question_type)
+                priority = random.randint(0, 100)
+                if 0 <= correct <= 0.2:
+                    duplicates = 5
+                elif 0.2 < correct <= 0.4:
+                    duplicates = 4
+                elif 0.4 < correct <= 0.6:
+                    duplicates = 3
+                elif 0.6 < correct <= 0.8:
+                    duplicates = 2
+                else:
+                    duplicates = 1
+                for i in range(duplicates):
+                    self.user.queue.enqueue((question_type, priority))
+        return self.user.queue.dequeue()[0]
