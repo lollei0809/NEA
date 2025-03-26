@@ -84,20 +84,21 @@ class ControlGame:
     def recommend_question(self):
         """Recommend a question type based on the user's scores."""
         self.user.get_queue()
+        print(self.user.queue.show())
         if self.user.queue.is_empty():
             for question_type in self.types:
                 correct = self.calc_average_correct(question_type)
-                priority = random.randint(0, 100)
-                if 0 <= correct <= 0.2:
-                    duplicates = 5
-                elif 0.2 < correct <= 0.4:
-                    duplicates = 4
-                elif 0.4 < correct <= 0.6:
+                #lowest possible % 33
+                if 0 <= correct <= 0.40:
                     duplicates = 3
-                elif 0.6 < correct <= 0.8:
+                elif 0.4 < correct <= 0.7:
                     duplicates = 2
-                else:
+                elif 0.8 < correct <= 1:
                     duplicates = 1
                 for i in range(duplicates):
+                    priority = random.randint(0, 100)
                     self.user.queue.enqueue((question_type, priority))
+        print(self.user.queue.show())
+        print(self.user.queue.show_front())
         return self.user.queue.dequeue()[0]
+

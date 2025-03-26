@@ -50,24 +50,28 @@ class GraphFrame(tk.Frame):
         for username, user_data in self.details_dict.items():
             for category, scores in user_data.items():
                 if isinstance(scores, dict) and "correct" in scores and "incorrect" in scores:
-                    for i, correct_value in enumerate(scores["correct"]):
+                    i = 1
+                    for correct_value in scores["correct"]:
                         data_list.append({
                             "Username": username,
-                            "Attempt": i + 1,
+                            "Attempt": i,
                             "Category": category,
                             "Type": "Correct",
                             "Score": correct_value
                         })
-                    for i, incorrect_value in enumerate(scores["incorrect"]):
+                        i += 1
+
+                    j = 1
+                    for incorrect_value in scores["incorrect"]:
                         data_list.append({
                             "Username": username,
-                            "Attempt": i + 1,
+                            "Attempt": j,
                             "Category": category,
                             "Type": "Incorrect",
                             "Score": incorrect_value
                         })
-
-        self.df = pd.DataFrame(data_list)
+                        j += 1
+                self.df = pd.DataFrame(data_list)
 
     def draw_1_user_1_category(self):
         filtered_df = self.df[(self.df["Category"] == self.category) & (self.df["Username"] == self.username1)]

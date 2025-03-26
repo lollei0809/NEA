@@ -9,6 +9,8 @@ details = {
                 "unsigned binary to decimal": {"correct": [12,9,10,2], "incorrect": [12,5,12,13]},
                 "decimal to unsigned binary": {"correct": [1], "incorrect": [9]},
                 "sign and magnitude binary to decimal": {"correct": [7], "incorrect": [6]},
+                "two's complement binary to decimal": {"correct": [0], "incorrect": [0]},
+                "decimal to two's complement binary": {"correct": [0], "incorrect": [0]},
                 "decimal to sign and magnitude binary": {"correct": [0], "incorrect": [0]},
                 "hexadecimal to decimal": {"correct": [0], "incorrect": [0]},
                 "decimal to hexadecimal": {"correct": [0], "incorrect": [0]}
@@ -22,6 +24,8 @@ details = {
                  "decimal to unsigned binary": {"correct": [0], "incorrect": [0]},
                  "sign and magnitude binary to decimal": {"correct": [0], "incorrect": [0]},
                  "decimal to sign and magnitude binary": {"correct": [0], "incorrect": [0]},
+                 "two's complement binary to decimal": {"correct": [0], "incorrect": [0]},
+                 "decimal to two's complement binary": {"correct": [0], "incorrect": [0]},
                  "hexadecimal to decimal": {"correct": [0], "incorrect": [0]},
                  "decimal to hexadecimal": {"correct": [0], "incorrect": [0]}
                  }

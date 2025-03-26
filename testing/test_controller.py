@@ -108,7 +108,7 @@ def test_recommend_question():
         "decimal to hexadecimal": {"correct": [], "incorrect": []}
     }}
     controller.recommend_question()
-    assert controller.user.queue.size() == (8 * 3) - 1
+    assert controller.user.queue.size() == 15
 
     controller.user.details_dict = {"username": {
         "name": "name",
@@ -125,21 +125,21 @@ def test_recommend_question():
         "decimal to hexadecimal": {"correct": [99], "incorrect": [1]}
     }}
     controller.recommend_question()
-    assert controller.user.queue.size() == (8 * 1) - 1
+    assert controller.user.queue.size() == 7
 
     controller.user.details_dict = {"username": {
         "name": "name",
         "hashed_password": "password",
         "signed_in": True,
         "question_queue": [],
-        "unsigned binary to decimal": {"correct": [0], "incorrect": [0]},  # 3
-        "decimal to unsigned binary": {"correct": [20], "incorrect": [80]},  # 5
-        "sign and magnitude binary to decimal": {"correct": [40], "incorrect": [60]},  # 4
-        "decimal to sign and magnitude binary": {"correct": [60], "incorrect": [40]},  # 3
-        "two's complement binary to decimal": {"correct": [80], "incorrect": [20]},  # 2
-        "decimal to two's complement binary": {"correct": [], "incorrect": []},  # 3
+        "unsigned binary to decimal": {"correct": [0], "incorrect": [0]},
+        "decimal to unsigned binary": {"correct": [20], "incorrect": [80]},
+        "sign and magnitude binary to decimal": {"correct": [40], "incorrect": [60]},
+        "decimal to sign and magnitude binary": {"correct": [60], "incorrect": [40]},
+        "two's complement binary to decimal": {"correct": [80], "incorrect": [20]},
+        "decimal to two's complement binary": {"correct": [70], "incorrect": [30]},
         "hexadecimal to decimal": {"correct": [], "incorrect": []},
         "decimal to hexadecimal": {"correct": [], "incorrect": []}
     }}
     controller.recommend_question()
-    assert controller.user.queue.size() == 25
+    assert controller.user.queue.size() == 17

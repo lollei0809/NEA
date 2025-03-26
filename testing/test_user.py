@@ -5,17 +5,17 @@ details_file = "test_details.json"
 
 @pytest.fixture
 def user():
-    """Fixture to create a new user before each test."""
+    """thjis fixture creates a new user before each test."""
     u = User()
     u.details_dict = {}
     return u
 
 
 def test_signup(user):
-    """Test sign up puts the user in the details dict with the correct name and signed in status"""
-    user.sign_up("John Doe", "johnd", "password123")
-    assert "johnd" in user.details_dict
-    assert user.details_dict["johnd"]["name"] == "John Doe"
+    """puts the user in the details dict with the correct username etc"""
+    user.sign_up("John Doe", "john123", "password123")
+    assert "john123" in user.details_dict
+    assert user.details_dict["john123"]["name"] == "John Doe"
     assert user.signed_in is True
 
 
@@ -69,7 +69,7 @@ def test_save_and_load_details(user):
 
 
 def test_find_high_score():
-    """Test finding the highest score in a game type with multiple scores"""
+    """tests finding the highest score in a game type with multiple scores"""
     user = User()
     user.sign_up("lolly","ll","asdf")
     assert user.find_high_score("unsigned binary to decimal") == 0
